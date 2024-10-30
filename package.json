@@ -1,0 +1,36 @@
+{
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare"
+    },
+    "devDependencies": {
+        "@nuxt/devtools": "^1.6.0",
+        "@nuxtjs/i18n": "^8.0.0-beta.9",
+        "@rollup/plugin-alias": "^3.1.9",
+        "@tailwindcss/forms": "^0.5.3",
+        "@tailwindcss/typography": "^0.5.7",
+        "autoprefixer": "^10.4.12",
+        "nuxt": "3.6.0",
+        "postcss": "^8.4.17",
+        "prettier": "^2.8.0",
+        "prettier-plugin-tailwindcss": "^0.2.0",
+        "tailwindcss": "^3.3.2",
+        "typescript": "^4.6.4",
+        "vue-tsc": "^0.40.4"
+    },
+    "dependencies": {
+        "@pinia/nuxt": "^0.4.6",
+        "pinia": "^2.0.22",
+        "sweetalert2": "^11.14.4",
+        "vue-height-collapsible": "^0.1.1",
+        "vue-i18n": "^9.2.2",
+        "vue3-perfect-scrollbar": "^1.6.0",
+        "vue3-popper": "^1.5.0",
+        "vue3-toastify": "^0.2.4"
+    }
+}
