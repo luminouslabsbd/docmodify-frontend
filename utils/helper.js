@@ -17,15 +17,20 @@ export const deleteConfirmation = async () => {
         cancelButtonText: 'Cancel',
         padding: '2em',
         customClass: {
-            confirmButton: 'bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2',
-            cancelButton: 'bg-gray-300 text-gray-700 hover:bg-gray-400 rounded px-4 py-2',
-            title: 'font-bold text-lg',
-            content: 'text-base',
+            confirmButton: 'swal2-confirm bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2',
+            cancelButton: 'swal2-cancel bg-gray-300 text-gray-700 hover:bg-gray-400 rounded px-4 py-2',
+            title: 'swal2-title font-bold text-lg',
+            content: 'swal2-content text-base',
         },
     });
 }
 
 
+export const tabs = {
+    DOCUMENT:'document',
+    INTERVIEW:'interview',
+    ASSESSMENT:'assessment',
+}
 
 
 

@@ -4,12 +4,8 @@ import { useRoute } from "vue-router";
 import { toast } from "vue3-toastify";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 import Evidence from "~/components/evidence/Evidence.vue";
+import { tabs } from "~/utils/helper";
 
-const tabs = {
-    DOCUMENT:'document',
-    INTERVIEW:'interview',
-    ASSESSMENT:'assessment',
-}
 const config = useRuntimeConfig();
 const selectedTab = ref(tabs.DOCUMENT);
 
@@ -77,6 +73,11 @@ const fetchMenu = async () => {
     } catch (err) {
         error.value = err.message;
     }
+}
+
+const changeTab = async (tab) =>{
+    selectedTab.value = tab;
+    await fetchEvidence();
 }
 
 const fetchPciDssForm = async (id) => {
@@ -355,23 +356,15 @@ onMounted(async () => {
                     :key="index"
                     class="w-full py-1.5 font-medium rounded-sm"
                     :class="{ 'btn btn-info shadow-none': selectedTab === tab }"
-                    @click="selectedTab = tab"
+                    @click="changeTab(tab)"
                 >
                     <span class="capitalize font-semibold" >{{ tab }}</span>
                 </Tab>
             </TabList>
 
             <TabPanels>
-                <TabPanel  v-show="selectedTab === tabs.DOCUMENT">
-                    <Evidence />
-                </TabPanel>
-
-                <TabPanel  v-show="selectedTab === tabs.INTERVIEW">
-                    <h1 class="text-4xl">Interview Panel</h1>
-                </TabPanel>
-
-                <TabPanel  v-show="selectedTab === tabs.ASSESSMENT">
-                    <h1 class="text-4xl">Assessment Panel</h1>
+                <TabPanel v-for="(tab,key) in tabs">
+                    <Evidence :tab="tab" :evidences="evidences" :fetchEvidence="fetchEvidence" />
                 </TabPanel>
             </TabPanels>
         </TabGroup>

@@ -9,7 +9,6 @@ import { deleteConfirmation } from '~/utils/helper';
 useHead({title:'Project'})
 const config = useRuntimeConfig();
 const isOpen = ref(false);
-const projects = ref([]);
 const errors = ref({});
 const page = ref(1);
 const perPage = ref(15);
@@ -35,31 +34,21 @@ const resetForm = () => {
     isEdit.value.id = null;
 };
 
-const getProjects = async () => {
-    const {data, error, pending, status , refresh} = useAsyncData('organizer_projects',
-        () =>
-        $fetch('/organizer/project',{
-            baseURL : config.public.apiUrl,
-            method : "GET",
-            params : {
-                page: page.value,
-                query: query.value,
-                perPage: perPage.value,
-            }
-        }),{
-            watch:[ page, query, perPage],
-            cache:false,
+const {data:projects, error, pending, status , refresh} = useAsyncData('organizer_projects',
+    () =>
+    $fetch('/organizer/project',{
+        baseURL : config.public.apiUrl,
+        method : "GET",
+        params : {
+            page: page.value,
+            query: query.value,
+            perPage: perPage.value,
         }
-    )
-
-    if (data.value) {
-        projects.value = data.value;
+    }),{
+        watch:[ page, query, perPage],
+        cache:false,
     }
-
-    if(status.value === 'error'){
-        console.log('Error ',error)
-    }
-};
+);
 
 const getProjectById = async (id) => {
     const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/project/${id}`);
@@ -94,7 +83,7 @@ const submitForm = async () => {
             errors.value = error.value?.data?.errors;
         }
         if (status.value === 'success') {
-            await getProjects();
+            await refresh();
             resetForm();
             isOpen.value = false;
             toast.success(data.value?.message)
@@ -119,14 +108,14 @@ const deleteProject = async (id) => {
         }
 
         if (status.value === 'success') {
-            await getProjects();
+            await refresh();
             toast.success(data.value?.message);
         }
     }
 }
 
 onMounted(async () => {
-    await getProjects();
+    await refresh();
 });
 
 </script>

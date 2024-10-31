@@ -664,3 +664,23 @@
 .no-animtion [data-height-collapsible] {
     transition: none !important;
 }
+
+/* Confirm button */
+.swal2-confirm {
+    @apply bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2;
+}
+
+/* Cancel button */
+.swal2-cancel {
+    @apply bg-gray-300 text-gray-700 hover:bg-gray-400 rounded px-4 py-2;
+}
+
+/* Title */
+.swal2-title {
+    @apply font-bold text-lg;
+}
+
+/* Content */
+.swal2-html-container {
+    @apply text-base;
+}
