@@ -43,9 +43,6 @@
                     </button>
                 </template>
             </div>
-            <div>
-                <h1 class="text-6xl">Welcome to my layout</h1>
-            </div>
             <slot />
         </div>
     </div>

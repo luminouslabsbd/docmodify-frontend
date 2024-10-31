@@ -2,6 +2,17 @@
 import { ref, reactive, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import { toast } from "vue3-toastify";
+import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
+import Evidence from "~/components/evidence/Evidence.vue";
+
+const tabs = {
+    DOCUMENT:'document',
+    INTERVIEW:'interview',
+    ASSESSMENT:'assessment',
+}
+const config = useRuntimeConfig();
+const selectedTab = ref(tabs.DOCUMENT);
+
 
 const defaultValues = ref({
     descriptionTitle: "Requirement Description",
@@ -13,8 +24,7 @@ const defaultValues = ref({
     notChecked: '☐',
 });
 
-
-
+useHead({ title: 'Assessment' });
 const route = useRoute();
 const menus = ref([]);
 const error = ref(null);
@@ -27,6 +37,7 @@ const selectedIds = reactive({
     project_id: route.params?.id,
 })
 const isOpen = ref(false);
+const evidences = ref([]);
 
 const submitForm = async () => {
     const formData = new FormData(event.target);
@@ -102,6 +113,18 @@ const fetchPciDssForm = async (id) => {
     }
 }
 
+const fetchEvidence = async () => {
+    const { data, error, status } = await useFetch(`${config.public.apiUrl}/user/evidence/${selectedTab.value}`);
+    if (status.value === 'success') {
+        evidences.value = data.value?.data;
+        isOpen.value = true
+    }
+
+    if(status.value === 'error'){
+        console.log('Error ',error)
+    }
+}
+
 onMounted(async () => {
     await fetchMenu();
     await fetchPciDssForm(1);
@@ -110,38 +133,42 @@ onMounted(async () => {
 </script>
 <template>
     <div class="panel">
-        <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Reference</h5>
-            <button @click="isOpen = true" type="button" class="btn btn-info btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ltr:mr-1.5 rtl:ml-1.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg> Create
+        <div class="mb-5 flex items-center justify-between sticky top-[62px] bg-white dark:bg-black-dark-light dark:text-dark-light backdrop:blur-md px-3 py-3 border-b border-gray-100 dark:border-slate-800">
+            <h5 class="text-lg font-semibold dark:text-white-light">Assignment - PCI DSS v4.0.1 Report on Compliance</h5>
+            <button @click="fetchEvidence()" type="button" class="btn btn-info btn-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </svg>
+                <span class="ml-2">Reference</span>
             </button>
         </div>
         <div class="flex justify-between">
-            <div class="w-3/12">
-                <ul style="height: 100vh;overflow-y: scroll;">
+            <div class="w-3/12 p-4">
+                <ul class="max-h-screen h-full overflow-y-scroll  [&::-webkit-scrollbar]:w-2
+                            [&::-webkit-scrollbar-track]:rounded-full
+                            [&::-webkit-scrollbar-track]:bg-gray-100
+                            [&::-webkit-scrollbar-thumb]:rounded-full
+                            [&::-webkit-scrollbar-thumb]:bg-info
+                            dark:[&::-webkit-scrollbar-track]:bg-info
+                            dark:[&::-webkit-scrollbar-thumb]:bg-info">
                     <li v-for="(requirement, key) in menus">
-                        <a>{{ requirement?.title }}</a>
-                    <li v-for="(description, key) in requirement?.descriptions ">
-                        <a v-html="description?.title"></a>
-                    <li v-for="(pciDss, key) in description?.pci_dss" class="" style="list-style-type: none;">
-                        <p @click="fetchPciDssForm(pciDss?.id)" style="cursor: pointer;">{{ pciDss?.key }}</p>
-                    </li>
-                    </li>
+                        <p class="font-bold bg-gray-300 dark:bg-slate-800 px-3 py-2 mb-1 rounded-sm cursor-pointer">{{ requirement?.title }}</p>
+                        <li class="ml-3" v-for="(description, key) in requirement?.descriptions ">
+                            <p class="px-2 py-1 mb-1 bg-gray-200 dark:bg-slate-800/75 rounded-sm cursor-pointer" v-html="description?.title"></p>
+                            <li class="ml-6" v-for="(pciDss, key) in description?.pci_dss">
+                                <p class="px-2 py-1 bg-gray-100 dark:bg-slate-700 mb-2 rounded-sm cursor-pointer hover:bg-info hover:text-white active:bg-info active:text-white" @click="fetchPciDssForm(pciDss?.id)" >{{ pciDss?.key }}</p>
+                            </li>
+                        </li>
                     </li>
                 </ul>
             </div>
-            <div class="w-9/12">
-                <form @submit.prevent="submitForm" style="height: 100vh; overflow-y: scroll;">
-                    <div class="" v-if="pciDss?.assignment">
-                        <h3>{{ pciDss?.title }}</h3>
-                        <div v-if="pciDss?.subTitle" v-html="pciDss?.subTitle"></div>
+            <div class="w-9/12 p-4">
+                <form @submit.prevent="submitForm">
+                    <div class="shadow-sm p-2" v-if="pciDss?.assignment">
+                        <h3 class="text-xl font-semibold">{{ pciDss?.title }}</h3>
+                        <div class="text-semibold m-2 leading-5" v-if="pciDss?.subTitle" v-html="pciDss?.subTitle"></div>
 
-                        <table v-if="pciDss?.isRequirement"
-                            class="table table-bordered border-secondary text-center text-white"
-                            style="border: 1px solid">
+                        <table v-if="pciDss?.isRequirement" class="" >
                             <thead>
                                 <tr>
                                     <th rowspan="2" class="align-middle" style="background: teal;color: white;">
@@ -177,17 +204,15 @@ onMounted(async () => {
                             </tbody>
                         </table>
 
-                        <table v-else class="table table-bordered border border-dark">
-                            <tr v-if="pciDss?.tableBody" v-for="(row, key) in pciDss?.tableBody">
+                        <table v-else class="border border-gray-100 dark:border-gray-700">
+                            <tr class="border-gray-100 dark:border-gray-700 my-2" v-if="pciDss?.tableBody" v-for="(row, key) in pciDss?.tableBody">
                                 <!-- .......................First Col.................... -->
-                                <td v-if="row?.title" :colspan="row?.colspan" :style="{
+                                <td class="border-gray-100 dark:border-gray-700 px-5 py-3" v-if="row?.title" :colspan="row?.colspan" :style="{
                                     backgroundColor: row?.bg || undefined,
                                     color: row?.bg ? 'white' : undefined,
                                     fontWeight: row?.bg ? 'bold' : undefined,
                                     fontSize: row?.bg ? '20px' : undefined,
-                                    padding: '3px 5px',
                                     width: row?.isLeft ? '15%' : '40%',
-                                    border: '1px solid',
                                     textAlign: row?.isLeft && 'center',
                                 }">
                                     <template v-if="row?.isLeft">
@@ -212,8 +237,8 @@ onMounted(async () => {
                                         <div v-html="row?.title" />
                                     </template>
                                     <template v-else>
-                                        <input type="text" style="border:1px solid #ebebeb;"
-                                            class="form-control form-control-sm" :name="row?.name"
+                                        <input type="text"
+                                            class="form-input" :name="row?.name"
                                             :value="inputValues[row?.name] ?? defaultValues.placeholder"
                                             :placeholder="defaultValues.placeholder">
                                     </template>
@@ -314,13 +339,42 @@ onMounted(async () => {
       ]"
     >
       <div class="p-4 flex justify-between items-center bg-gray-50">
-        <h2 class="text-2xl font-semibold">Create Organizer</h2>
+        <h2 class="text-2xl font-bold">Reference Panel</h2>
         <button
           @click="isOpen = false"
-          class="btn btn-sm btn-info"
+          class="btn btn-sm btn-danger"
         >
           ✕
         </button>
+      </div>
+      <div class="px-4 py-2">
+        <TabGroup>
+            <TabList class="flex space-x-1 bg-gray-200 rounded-sm">
+                <Tab
+                    v-for="(tab, index) in tabs"
+                    :key="index"
+                    class="w-full py-1.5 font-medium rounded-sm"
+                    :class="{ 'btn btn-info shadow-none': selectedTab === tab }"
+                    @click="selectedTab = tab"
+                >
+                    <span class="capitalize font-semibold" >{{ tab }}</span>
+                </Tab>
+            </TabList>
+
+            <TabPanels>
+                <TabPanel  v-show="selectedTab === tabs.DOCUMENT">
+                    <Evidence />
+                </TabPanel>
+
+                <TabPanel  v-show="selectedTab === tabs.INTERVIEW">
+                    <h1 class="text-4xl">Interview Panel</h1>
+                </TabPanel>
+
+                <TabPanel  v-show="selectedTab === tabs.ASSESSMENT">
+                    <h1 class="text-4xl">Assessment Panel</h1>
+                </TabPanel>
+            </TabPanels>
+        </TabGroup>
       </div>
     </div>
 </template>

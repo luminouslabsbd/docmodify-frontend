@@ -42,6 +42,7 @@ export default defineNuxtConfig({
             apiUrl: process.env.API_URL
         }
     },
+    plugins: ['~/plugins/vue-multiselect.js'],
 
     i18n: {
         locales: [

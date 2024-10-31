@@ -89,21 +89,7 @@ const submitForm = async () => {
 }
 
 const deleteOrganizer = async (id) => {
-    const result = await Swal.fire({
-        icon: 'warning',
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        showCancelButton: true,
-        confirmButtonText: 'Delete',
-        cancelButtonText: 'Cancel',
-        padding: '2em',
-        customClass: {
-            confirmButton: 'bg-red-500 text-white hover:bg-red-600 rounded px-4 py-2',
-            cancelButton: 'bg-gray-300 text-gray-700 hover:bg-gray-400 rounded px-4 py-2',
-            title: 'font-bold text-lg',
-            content: 'text-base',
-        },
-    });
+    const result = await deleteConfirmation();
 
     if (result.isConfirmed) {
         const { data, error, status } = await useFetch(`${config.public.apiUrl}/admin/organizer/${id}`, {
@@ -131,7 +117,7 @@ onMounted(async () => {
 <template>
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">Simple Table</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">All Users - {{ organizers?.total }}</h5>
             <button @click="isOpen = true" type="button" class="btn btn-info btn-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" viewBox="0 0 24 24"
                     fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">

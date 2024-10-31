@@ -517,7 +517,7 @@
                                             </NuxtLink>
                                         </li>
                                         <li class="border-t border-white-light dark:border-white-light/10">
-                                            <NuxtLink to="/auth/boxed-signin" class="!py-3 text-danger" @click="close()">
+                                            <NuxtLink to="/" class="!py-3 text-danger" @click="close()">
                                                 <svg
                                                     class="h-4.5 w-4.5 rotate-90 ltr:mr-2 rtl:ml-2 shrink-0"
                                                     width="18"

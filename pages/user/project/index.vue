@@ -1,17 +1,25 @@
 <script setup>
     import { ref , onMounted } from 'vue';
+    import { useFetch } from '#app';
+
+    const config = useRuntimeConfig();
+    useHead({title:'Assignment'})
     const projects = ref([]);
 
-    const getProjects = async ()=>{
-        const response = await fetch('http://localhost:8000/api/user-projects')
-        const data = await response.json();
-        projects.value = data;
-        console.log("🚀 ~ getProjects ~ projects:", projects?.value)
-    }
+    const getProjects = async () => {
+        const { data, error, status } = await useFetch(`${config.public.apiUrl}/user/projects`);
+        if (data.value) {
+            projects.value = data.value;
+        }
 
-onMounted(async()=>{
-    await getProjects();
-})
+        if(status.value === 'error'){
+            console.log('Error ',error)
+        }
+    };
+
+    onMounted(async()=>{
+        await getProjects();
+    })
 </script>
 <template>
     <div class="panel">
@@ -30,15 +38,15 @@ onMounted(async()=>{
                    <thead>
                        <tr>
                            <th>#SL</th>
-                           <th>Name</th>
+                           <th>Project Name</th>
                            <th>Description</th>
                            <th class="text-center">Action</th>
                        </tr>
                    </thead>
                    <tbody>
-                        <tr v-for="(project,key) in projects">
-                            <td>1</td>
-                            <td>{{ project?.name }}</td>
+                        <tr v-for="(project,key) in projects?.data">
+                            <td>{{ key + 1}}</td>
+                            <td>{{ project?.name}}</td>
                             <td>{{  project?.description }}</td>
                             <td>
                                 <div class="flex gap-3">
