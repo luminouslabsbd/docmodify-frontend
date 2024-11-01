@@ -70,7 +70,7 @@
         formData.append('type',form.value.type);
         errors.value = {};
         try {
-            const { data, error, pending, status } = await useFetch(`${config.public.apiUrl}/user/evidence`, {
+            const { data, error, pending, status } = await useApiFetch(`/user/evidence`, {
                 method:"POST",
                 body: formData,
             });
@@ -92,7 +92,7 @@
 
     const showEvidence = async (id) =>{
         try {
-            const { data, error, pending, status } = await useFetch(`${config.public.apiUrl}/user/show-evidence/${id}`);
+            const { data, error, pending, status } = await useApiFetch(`/user/show-evidence/${id}`);
 
             if (status.value === 'error') {
                 errors.value = error.value?.data?.errors;
@@ -111,7 +111,7 @@
         const result = await deleteConfirmation();
         if(result.isConfirmed){
             try {
-                const { data, error, pending, status } = await useFetch(`${config.public.apiUrl}/user/evidence/${id}`, {
+                const { data, error, pending, status } = await useApiFetch(`/user/evidence/${id}`, {
                     method:"DELETE",
                 });
 
