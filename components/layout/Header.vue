@@ -23,9 +23,7 @@
                         </svg>
                     </a>
                 </div>
-                <div class="hidden ltr:mr-2 rtl:ml-2 sm:block">
-
-                </div>
+                <div class="hidden ltr:mr-2 rtl:ml-2 sm:block"></div>
                 <div
                     class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-[#d0d2d6] sm:flex-1 ltr:sm:ml-0 sm:rtl:mr-0 lg:space-x-2"
                 >
@@ -38,7 +36,7 @@
                             <div class="relative">
                                 <input
                                     type="text"
-                                    class="peer form-input bg-gray-100 placeholder:tracking-widest ltr:pl-9 ltr:pr-9 rtl:pr-9 rtl:pl-9 sm:bg-transparent ltr:sm:pr-4 rtl:sm:pl-4"
+                                    class="peer form-input bg-gray-100 placeholder:tracking-widest ltr:pl-9 ltr:pr-9 rtl:pl-9 rtl:pr-9 sm:bg-transparent ltr:sm:pr-4 rtl:sm:pl-4"
                                     placeholder="Search..."
                                 />
                                 <button type="button" class="absolute inset-0 h-9 w-9 appearance-none peer-focus:text-primary ltr:right-auto rtl:left-auto">
@@ -133,7 +131,7 @@
                         </a>
                     </div>
 
-                    <div class="dropdown shrink-0">
+                    <!-- <div class="dropdown shrink-0">
                         <client-only>
                             <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-end' : 'bottom-start'" offsetDistance="8">
                                 <button
@@ -168,9 +166,9 @@
                                 </template>
                             </Popper>
                         </client-only>
-                    </div>
+                    </div> -->
 
-                    <div class="dropdown shrink-0">
+                    <!-- <div class="dropdown shrink-0">
                         <client-only>
                             <Popper :placement="store.rtlClass === 'rtl' ? 'bottom-start' : 'bottom-end'" offsetDistance="8">
                                 <button
@@ -205,14 +203,14 @@
                                         </li>
                                         <template v-for="msg in messages" :key="msg.id">
                                             <li>
-                                                <div class="flex items-center py-3 px-5">
+                                                <div class="flex items-center px-5 py-3">
                                                     <div v-html="msg.image"></div>
                                                     <span class="px-3 dark:text-gray-500">
                                                         <div class="text-sm font-semibold dark:text-white-light/90" v-text="msg.title"></div>
                                                         <div v-text="msg.message"></div>
                                                     </span>
                                                     <span
-                                                        class="whitespace-pre rounded bg-white-dark/20 px-1 font-semibold text-dark/60 ltr:ml-auto ltr:mr-2 rtl:mr-auto rtl:ml-2 dark:text-white-dark"
+                                                        class="whitespace-pre rounded bg-white-dark/20 px-1 font-semibold text-dark/60 ltr:ml-auto ltr:mr-2 rtl:ml-2 rtl:mr-auto dark:text-white-dark"
                                                         v-text="msg.time"
                                                     ></span>
                                                     <button type="button" class="text-neutral-300 hover:text-danger" @click="removeMessage(msg.id)">
@@ -232,7 +230,7 @@
                                         <template v-if="messages.length">
                                             <li class="mt-5 border-t border-white-light text-center dark:border-white/10">
                                                 <div
-                                                    class="group flex cursor-pointer items-center justify-center py-4 px-5 font-semibold text-primary dark:text-gray-400"
+                                                    class="group flex cursor-pointer items-center justify-center px-5 py-4 font-semibold text-primary dark:text-gray-400"
                                                     @click="close()"
                                                 >
                                                     <span class="group-hover:underline ltr:mr-1 rtl:ml-1">VIEW ALL ACTIVITIES</span>
@@ -333,7 +331,7 @@
                                                                 :src="`/assets/images/${notification.profile}`"
                                                                 alt=""
                                                             />
-                                                            <span class="absolute right-[6px] bottom-0 block h-2 w-2 rounded-full bg-success"></span>
+                                                            <span class="absolute bottom-0 right-[6px] block h-2 w-2 rounded-full bg-success"></span>
                                                         </div>
                                                     </div>
                                                     <div class="flex flex-auto ltr:pl-3 rtl:pr-3">
@@ -395,7 +393,7 @@
                                 </template>
                             </Popper>
                         </client-only>
-                    </div>
+                    </div> -->
 
                     <div class="dropdown shrink-0">
                         <client-only>
@@ -414,7 +412,7 @@
                                                 <div class="flex-none">
                                                     <img class="h-10 w-10 rounded-md object-cover" src="/assets/images/user-profile.jpeg" alt="" />
                                                 </div>
-                                                <div class="ltr:pl-4 rtl:pr-4 truncate">
+                                                <div class="truncate ltr:pl-4 rtl:pr-4">
                                                     <h4 class="text-base">
                                                         John Doe<span class="rounded bg-success-light px-1 text-xs text-success ltr:ml-2 rtl:ml-2">Pro</span>
                                                     </h4>
@@ -429,7 +427,7 @@
                                         <li>
                                             <NuxtLink to="/users/profile" class="dark:hover:text-white" @click="close()">
                                                 <svg
-                                                    class="h-4.5 w-4.5 ltr:mr-2 rtl:ml-2 shrink-0"
+                                                    class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2"
                                                     width="18"
                                                     height="18"
                                                     viewBox="0 0 24 24"
@@ -451,7 +449,7 @@
                                         <li>
                                             <NuxtLink to="/apps/mailbox" class="dark:hover:text-white" @click="close()">
                                                 <svg
-                                                    class="h-4.5 w-4.5 ltr:mr-2 rtl:ml-2 shrink-0"
+                                                    class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2"
                                                     width="18"
                                                     height="18"
                                                     viewBox="0 0 24 24"
@@ -478,7 +476,7 @@
                                         <li>
                                             <NuxtLink to="/auth/boxed-lockscreen" class="dark:hover:text-white" @click="close()">
                                                 <svg
-                                                    class="h-4.5 w-4.5 ltr:mr-2 rtl:ml-2 shrink-0"
+                                                    class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2"
                                                     width="18"
                                                     height="18"
                                                     viewBox="0 0 24 24"
@@ -517,9 +515,9 @@
                                             </NuxtLink>
                                         </li>
                                         <li class="border-t border-white-light dark:border-white-light/10">
-                                            <NuxtLink to="/" class="!py-3 text-danger" @click="close()">
+                                            <a href="javascript:void(0)" class="!py-3 text-danger" @click="logoutUser">
                                                 <svg
-                                                    class="h-4.5 w-4.5 rotate-90 ltr:mr-2 rtl:ml-2 shrink-0"
+                                                    class="h-4.5 w-4.5 shrink-0 rotate-90 ltr:mr-2 rtl:ml-2"
                                                     width="18"
                                                     height="18"
                                                     viewBox="0 0 24 24"
@@ -543,7 +541,7 @@
                                                 </svg>
 
                                                 Sign Out
-                                            </NuxtLink>
+                                            </a>
                                         </li>
                                     </ul>
                                 </template>
@@ -555,7 +553,7 @@
 
             <!-- horizontal menu -->
             <ul
-                class="horizontal-menu hidden border-t border-[#ebedf2] bg-white py-1.5 px-6 font-semibold text-black rtl:space-x-reverse dark:border-[#191e3a] dark:bg-[#0e1726] dark:text-white-dark lg:space-x-1.5 xl:space-x-8"
+                class="horizontal-menu hidden border-t border-[#ebedf2] bg-white px-6 py-1.5 font-semibold text-black rtl:space-x-reverse dark:border-[#191e3a] dark:bg-[#0e1726] dark:text-white-dark lg:space-x-1.5 xl:space-x-8"
             >
                 <li class="menu nav-item relative">
                     <a href="javascript:;" class="nav-link">
@@ -768,7 +766,7 @@
                 <li class="menu nav-item relative">
                     <a href="javascript:;" class="nav-link">
                         <div class="flex items-center">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"  class="shrink-0">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="shrink-0">
                                 <path
                                     fill-rule="evenodd"
                                     clip-rule="evenodd"
@@ -1247,10 +1245,15 @@
 
     import { useRoute } from 'vue-router';
     import { useAppStore } from '@/stores/index';
+    import useAuthStore from '~/stores/useAuthStore';
+    import { useTokenStore } from '~/stores/useTokenStore';
     const store = useAppStore();
     const route = useRoute();
     const search = ref(false);
     const { setLocale } = useI18n();
+
+    const authStore = useTokenStore();
+    const {logout} = useAuthStore()
 
     // multi language
     const changeLanguage = (item: any) => {
@@ -1347,5 +1350,12 @@
 
     const removeMessage = (value: number) => {
         messages.value = messages.value.filter((d) => d.id !== value);
+    };
+
+    // logout functions
+    const logoutLoading = ref(false);
+    const logoutUser = () => {
+        logoutLoading.value = true;
+        logout();
     };
 </script>

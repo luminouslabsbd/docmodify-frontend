@@ -35,11 +35,13 @@ export default defineNuxtConfig({
             autoprefixer: {},
         },
     },
-    modules: ['@pinia/nuxt', '@nuxtjs/i18n'],
+    modules: ['@pinia/nuxt', '@nuxtjs/i18n',,
+        'pinia-plugin-persistedstate/nuxt'],
 
     runtimeConfig:{
         public:{
-            apiUrl: process.env.API_URL
+            apiUrl: (process.env.API_URL || '') + (process.env.API_ENDPOINT || ''),
+            baseUrl: process.env.API_URL || '',
         }
     },
     plugins: ['~/plugins/vue-multiselect.js'],

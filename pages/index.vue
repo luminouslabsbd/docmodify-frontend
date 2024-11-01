@@ -3,16 +3,62 @@
     import appSetting from '@/app-setting';
     import { useAppStore } from '@/stores/index';
     import { useRouter } from 'vue-router';
+    import { useTokenStore } from '~/stores/useTokenStore';
+    import useAuthStore from '~/stores/useAuthStore';
+    import { toast } from "vue3-toastify";
 
     definePageMeta({
         layout:'auth-layout',
+        middleware:['guest']
     })
 
     useHead({ title: 'Login' });
 
     const router = useRouter();
+    const route = useRoute();
     const store = useAppStore();
     const { setLocale } = useI18n();
+
+
+
+
+
+const { setToken, setAuthUser } = useTokenStore();
+const form = ref()
+const state = reactive({
+  email: 'docmodify.admin@gmail.com',//undefined,
+  password: 'Z.t$jf_>CU{]Sg*6wB2?}5',//undefined,
+  remember: false
+})
+
+
+const {login, fetchUser} = useAuthStore();
+const pending = ref(false)
+const errors = ref({})
+
+
+const onSubmit = async () => {
+  pending.value = true;
+  const {data, error} = await login(state)
+  errors.value = error?.value?.data
+  console.log("🚀 ~ onSubmit ~ errors:", errors.value)
+  if(error?.value){
+    toast.error(error?.value?.data ?? "Have An Error, Please Try Again...")
+  }
+  if (!error.value){
+    setToken(data.value)
+    console.log(data.value)
+    const userData = await fetchUser();
+    setAuthUser(userData?.data?.value)
+    if(userData?.data?.value){
+      //toast.success('Login Successfully....')
+      return navigateTo(route?.query?.redirect ?? '/admin/dashboard')
+    }
+  }
+  pending.value = false;
+}
+
+
 
 </script>
 
@@ -57,11 +103,13 @@
                             <h1 class="text-3xl font-extrabold uppercase !leading-snug text-primary md:text-4xl">Sign in</h1>
                             <p class="text-base font-bold leading-normal text-white-dark">Enter your email and password to login</p>
                         </div>
-                        <form class="space-y-5 dark:text-white" @submit.prevent="router.push('/admin/dashboard')">
+                        <form class="space-y-5 dark:text-white" @submit.prevent="onSubmit">
                             <div>
                                 <label for="Email">Email</label>
                                 <div class="relative text-white-dark">
-                                    <input id="Email" type="email" placeholder="Enter Email" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input id="Email" type="email"
+                                    v-model="state.email"
+                                    placeholder="Enter Email" class="form-input ps-10 placeholder:text-white-dark" />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                                             <path
@@ -76,11 +124,14 @@
                                         </svg>
                                     </span>
                                 </div>
+
                             </div>
                             <div>
                                 <label for="Password">Password</label>
                                 <div class="relative text-white-dark">
-                                    <input id="Password" type="password" placeholder="Enter Password" class="form-input ps-10 placeholder:text-white-dark" />
+                                    <input id="Password" type="password"
+                                    v-model="state.password"
+                                    placeholder="Enter Password" class="form-input ps-10 placeholder:text-white-dark" />
                                     <span class="absolute start-4 top-1/2 -translate-y-1/2">
                                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                                             <path

@@ -3,12 +3,20 @@ import { ref, onMounted } from 'vue';
 import { toast } from "vue3-toastify";
 import { useAsyncData } from '#app';
 import { useFetch } from '#app';
-import Swal from 'sweetalert2';
+import { useApiFetch } from '~/composables/useApiFetch';
+import { useTokenStore } from '~/stores/useTokenStore';
 
-const config = useRuntimeConfig();
+useHead({ title: 'Organizer' })
+definePageMeta({
+    middleware: ['auth']
+})
+
+
 const isOpen = ref(false);
-const organizers = ref([]);
 const errors = ref({});
+const page = ref(1);
+const perPage = ref(15);
+const query = ref('');
 
 const isEdit = ref({
     edit: false,
@@ -38,18 +46,42 @@ const resetForm = () => {
     isEdit.value.id = null;
 };
 
-const getAllOrganizer = async () => {
-    const response = await fetch(`${config.public.apiUrl}/admin/organizer`);
-    const data = await response.json();
-    organizers.value = data?.data;
-};
+const createOrganizer = () => {
+    resetForm()
+    isOpen.value = true
+}
+
+const { data: organizers, error, pending, status, refresh } = useAsyncData(
+    'admin_organizers',
+    () =>
+        $fetch('/admin/organizer', {
+            baseURL: useRuntimeConfig().public.apiUrl,
+            method: 'GET',
+            params: {
+                page: page.value,
+                query: query.value,
+                perPage: perPage.value,
+            },
+            headers: {
+                Authorization: `Bearer ${useTokenStore().token}`,
+            },
+        }),
+    {
+        watch: [page, query, perPage],
+        cache: true,
+        immediate: true,
+    }
+)
+
 
 const getOrganizerById = async (id) => {
-    const { data, error, status } = await useFetch(`${config.public.apiUrl}/admin/organizer/${id}`);
+    const { data, error, status } = await useApiFetch(`/admin/organizer/${id}`, {
+        method: 'GET',
+    });
 
     if (status.value === 'error') {
+        console.log("🚀 ~ deleteOrganizer ~ error:", error.value?.data)
         toast.error("Something want wrong!");
-        console.log("🚀 ~ getOrganizerById ~ error:", error.value?.data)
     }
 
     if (status.value === 'success') {
@@ -61,15 +93,14 @@ const getOrganizerById = async (id) => {
 }
 
 const submitForm = async () => {
-    errors.value = {};
+
     try {
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
-            ? `${config.public.apiUrl}/admin/organizer/${isEdit.value.id}`
-            : `${config.public.apiUrl}/admin/organizer`;
-
-        const { data, error, pending, status } = await useFetch(url, {
-            method,
+            ? `/admin/organizer/${isEdit.value.id}`
+            : `/admin/organizer`;
+        const { data, error, pending, status } = await useApiFetch(url, {
+            method: method,
             body: form.value
         });
 
@@ -77,7 +108,7 @@ const submitForm = async () => {
             errors.value = error.value?.data?.errors;
         }
         if (status.value === 'success') {
-            await getAllOrganizer();
+            await refresh();
             resetForm();
             isOpen.value = false;
             toast.success(data.value?.message)
@@ -92,7 +123,7 @@ const deleteOrganizer = async (id) => {
     const result = await deleteConfirmation();
 
     if (result.isConfirmed) {
-        const { data, error, status } = await useFetch(`${config.public.apiUrl}/admin/organizer/${id}`, {
+        const { data, error, status } = await useApiFetch(`/admin/organizer/${id}`, {
             method: 'DELETE',
         });
 
@@ -102,32 +133,29 @@ const deleteOrganizer = async (id) => {
         }
 
         if (status.value === 'success') {
-            await getAllOrganizer();
+            await refresh();
             toast.success(data.value?.message);
         }
     }
 }
-
-onMounted(async () => {
-    await getAllOrganizer();
-});
 
 </script>
 
 <template>
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">All Users - {{ organizers?.total }}</h5>
-            <button @click="isOpen = true" type="button" class="btn btn-info btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-                Create
-            </button>
+            <h5 class="text-lg font-semibold dark:text-white-light">All Users - {{ organizers?.data?.total }}</h5>
+            <div class="flex gap-3">
+                <input type="search" v-model="query" placeholder="Search..." class="form-input">
+                <button @click="createOrganizer()" type="button" class="btn btn-info btn-sm space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span>
+                        Create
+                    </span>
+                </button>
+            </div>
         </div>
         <div class="mb-5">
             <div class="table-responsive">
@@ -143,7 +171,7 @@ onMounted(async () => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(organizer, key) in organizers?.data">
+                        <tr v-for="(organizer, key) in organizers?.data?.data">
                             <td>{{ key + 1 }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.name }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.phone }}</td>
@@ -161,6 +189,72 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
+            <div class="flex justify-between mt-3">
+                <div>
+                    <select v-model="perPage" id="" class="form-input">
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div>
+                    <ul class="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
+                        <li>
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                First
+                            </button>
+                        </li>
+                        <li v-for="(link, key) in organizers?.data?.links">
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                <span v-html="link?.label"></span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                Last
+                            </button>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
         </div>
     </div>
 
@@ -169,7 +263,7 @@ onMounted(async () => {
         'fixed right-0 top-0 z-50 h-full w-[550px] bg-white shadow-lg transition-transform duration-300 ease-in-out',
     ]">
         <div class="flex items-center justify-between bg-gray-50 p-4">
-            <h2 class="text-2xl font-semibold">Create Organizer</h2>
+            <h2 class="text-2xl font-semibold">{{ isEdit.edit ? "Edit" : "Create" }} Organizer</h2>
             <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
         </div>
         <div class="p-4">

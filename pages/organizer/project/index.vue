@@ -5,8 +5,13 @@ import { useLazyAsyncData } from '#app';
 import { useFetch } from '#app';
 import { formatDate } from '~/utils/helper';
 import { deleteConfirmation } from '~/utils/helper';
+import { useTokenStore } from '~/stores/useTokenStore';
 
 useHead({title:'Project'})
+definePageMeta({
+    middleware:['auth','admin']
+})
+
 const config = useRuntimeConfig();
 const isOpen = ref(false);
 const errors = ref({});
@@ -34,24 +39,39 @@ const resetForm = () => {
     isEdit.value.id = null;
 };
 
-const {data:projects, error, pending, status , refresh} = useAsyncData('organizer_projects',
+const createProject = ()=>{
+    resetForm()
+    isOpen.value = true
+}
+
+
+const { data: projects, error, pending, status, refresh } = useAsyncData(
+    'organizer_projects',
     () =>
-    $fetch('/organizer/project',{
-        baseURL : config.public.apiUrl,
-        method : "GET",
-        params : {
-            page: page.value,
-            query: query.value,
-            perPage: perPage.value,
-        }
-    }),{
-        watch:[ page, query, perPage],
-        cache:false,
+        $fetch('/organizer/project', {
+            baseURL: useRuntimeConfig().public.apiUrl,
+            method: 'GET',
+            params: {
+                page: page.value,
+                query: query.value,
+                perPage: perPage.value,
+            },
+            headers: {
+                Authorization: `Bearer ${useTokenStore().token}`,
+            },
+        }),
+    {
+        watch: [page, query, perPage],
+        cache: true,
+        immediate: true,
     }
-);
+)
+
 
 const getProjectById = async (id) => {
-    const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/project/${id}`);
+    const { data, error, status } = await useApiFetch(`/organizer/project/${id}`, {
+        method: 'GET',
+    });
 
     if (status.value === 'error') {
         toast.error("Something want wrong!");
@@ -71,10 +91,10 @@ const submitForm = async () => {
     try {
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
-            ? `${config.public.apiUrl}/organizer/project/${isEdit.value.id}`
-            : `${config.public.apiUrl}/organizer/project`;
+            ? `/organizer/project/${isEdit.value.id}`
+            : `/organizer/project`;
 
-        const { data, error, pending, status } = await useFetch(url, {
+        const { data, error, pending, status } = await useApiFetch(url, {
             method,
             body: form.value
         });
@@ -98,7 +118,7 @@ const deleteProject = async (id) => {
     const result = await deleteConfirmation();
 
     if (result.isConfirmed) {
-        const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/project/${id}`, {
+        const { data, error, status } = await useApiFetch(`/organizer/project/${id}`, {
             method: 'DELETE',
         });
 
@@ -113,27 +133,23 @@ const deleteProject = async (id) => {
         }
     }
 }
-
-onMounted(async () => {
-    await refresh();
-});
-
 </script>
 
 <template>
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
             <h5 class="text-lg font-semibold dark:text-white-light">Projects - <small>{{ projects?.data?.total }}</small></h5>
-            <button @click="isOpen = true" type="button" class="btn btn-info btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-                Create
-            </button>
+            <div class="flex gap-3">
+                <input type="search" v-model="query" placeholder="Search..." class="form-input">
+                <button @click="createProject()" type="button" class="btn btn-info btn-sm space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span>
+                        Create
+                    </span>
+                </button>
+            </div>
         </div>
         <div class="mb-5">
             <div class="table-responsive">
@@ -142,7 +158,7 @@ onMounted(async () => {
                         <tr>
                             <th>#SL</th>
                             <th>Project Name</th>
-                            <th>Description</th>
+                            <th class="w-[40%]">Description</th>
                             <th>Created At</th>
                             <th class="text-center">Action</th>
                         </tr>
@@ -151,7 +167,7 @@ onMounted(async () => {
                         <tr v-for="(project, key) in projects?.data?.data">
                             <td>{{ key + 1 }}</td>
                             <td class="whitespace-nowrap">{{ project?.name }}</td>
-                            <td class="whitespace-nowrap">{{ project?.description }}</td>
+                            <td class="whitespace-nowrap w-[40%]">{{ project?.description }}</td>
                             <td class="whitespace-nowrap">{{ formatDate(project?.created_at) }}</td>
                             <td>
                                 <div class="flex gap-3">
@@ -164,6 +180,71 @@ onMounted(async () => {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="flex justify-between mt-3">
+                <div>
+                    <select v-model="perPage" id="" class="form-input">
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div>
+                    <ul class="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
+                        <li>
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                First
+                            </button>
+                        </li>
+                        <li v-for="(link, key) in organizers?.data?.links">
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                <span v-html="link?.label"></span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                Last
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>

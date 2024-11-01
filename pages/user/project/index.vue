@@ -1,25 +1,40 @@
 <script setup>
     import { ref , onMounted } from 'vue';
     import { useFetch } from '#app';
+import { useTokenStore } from '~/stores/useTokenStore';
 
-    const config = useRuntimeConfig();
     useHead({title:'Assignment'})
-    const projects = ref([]);
-
-    const getProjects = async () => {
-        const { data, error, status } = await useFetch(`${config.public.apiUrl}/user/projects`);
-        if (data.value) {
-            projects.value = data.value;
-        }
-
-        if(status.value === 'error'){
-            console.log('Error ',error)
-        }
-    };
-
-    onMounted(async()=>{
-        await getProjects();
+    definePageMeta({
+        middleware:['auth']
     })
+
+    const page = ref(1);
+    const perPage = ref(15);
+    const query = ref('');
+
+const { data: projects, error, pending, status, refresh } = useAsyncData(
+
+    'user_projects',
+    () =>
+        $fetch('/user/projects', {
+            baseURL: useRuntimeConfig().public.apiUrl,
+            method: 'GET',
+            params: {
+                page: page.value,
+                query: query.value,
+                perPage: perPage.value,
+            },
+            headers: {
+                Authorization: `Bearer ${useTokenStore().token}`,
+            },
+        }),
+    {
+        watch: [page, query, perPage],
+        cache: true,
+        immediate: true,
+    }
+)
+
 </script>
 <template>
     <div class="panel">

@@ -32,6 +32,11 @@ export const tabs = {
     ASSESSMENT:'assessment',
 }
 
+export const authType = {
+    ADMIN : "admin",
+    ORGANIZER : "organizer",
+    USER : "user",
+}
 
 
 

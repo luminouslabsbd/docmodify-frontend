@@ -5,10 +5,11 @@ import { toast } from "vue3-toastify";
 import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 import Evidence from "~/components/evidence/Evidence.vue";
 import { tabs } from "~/utils/helper";
+import { useTokenStore } from "~/stores/useTokenStore";
 
+useHead({ title: 'Assessment' });
 const config = useRuntimeConfig();
-const selectedTab = ref(tabs.DOCUMENT);
-
+const {authUser} = useTokenStore()
 
 const defaultValues = ref({
     descriptionTitle: "Requirement Description",
@@ -20,9 +21,8 @@ const defaultValues = ref({
     notChecked: '☐',
 });
 
-useHead({ title: 'Assessment' });
+const selectedTab = ref(tabs.DOCUMENT);
 const route = useRoute();
-const menus = ref([]);
 const error = ref(null);
 const pciDss = ref({});
 const inputValues = ref({});
@@ -34,6 +34,59 @@ const selectedIds = reactive({
 })
 const isOpen = ref(false);
 const evidences = ref([]);
+
+
+// const fetchMenu = async () => {
+//     try {
+//         const response = await fetch('http://localhost:8000/api/get-menus');
+//         if (!response.ok) throw new Error('Failed to fetch menus');
+//         menus.value = await response.json();
+//     } catch (err) {
+//         error.value = err.message;
+//     }
+// }
+
+
+const { data: menus,refresh:menuRefresh} = useAsyncData(
+    'user_menus',
+    () =>
+        $fetch('/user/get-menus', {
+            baseURL: useRuntimeConfig().public.apiUrl,
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${useTokenStore().token}`,
+            },
+        }),
+    {
+        cache: true,
+        immediate: true,
+    }
+)
+
+const fetchPciDssForm = async (id) => {
+    try {
+        const {data, error, pending, status} = await useApiFetch(`/user/get-pci-dss-form`, {
+            method: 'POST',
+            body: JSON.stringify({
+                userId: authUser?.id,
+                projectId: route?.params?.id,
+                requirementId:id,
+            }),
+        });
+
+
+        if (selectedIds) {
+            selectedIds.requirement_id = data?.formData?.requirement_id || null;
+            selectedIds.description_id = data?.formData?.description_id || null;
+            selectedIds.pci_dss_id = data?.formData?.pci_dss_id || null;
+            selectedIds.project_id = route.params.id || 1;
+        }
+
+    } catch (err) {
+        console.log("🚀 ~ fetchPciDssForm ~ err:", err)
+        error.value = err.message;
+    }
+}
 
 const submitForm = async () => {
     const formData = new FormData(event.target);
@@ -65,53 +118,9 @@ const submitForm = async () => {
     }
 };
 
-const fetchMenu = async () => {
-    try {
-        const response = await fetch('http://localhost:8000/api/get-menus');
-        if (!response.ok) throw new Error('Failed to fetch menus');
-        menus.value = await response.json();
-    } catch (err) {
-        error.value = err.message;
-    }
-}
-
 const changeTab = async (tab) =>{
     selectedTab.value = tab;
     await fetchEvidence();
-}
-
-const fetchPciDssForm = async (id) => {
-    try {
-        const response = await fetch(`http://localhost:8000/api/get-pci-dss-form`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                userId: 3,
-                projectId: route?.params?.id,
-                pciDssId: id,
-            }),
-        });
-        if (!response.ok) throw new Error('Failed to fetch menus');
-        const data = await response.json();
-
-        if (selectedIds) {
-            selectedIds.requirement_id = data?.formData?.requirement_id || null;
-            selectedIds.description_id = data?.formData?.description_id || null;
-            selectedIds.pci_dss_id = data?.formData?.pci_dss_id || null;
-            selectedIds.project_id = route.params.id || 1;
-        }
-
-        pciDss.value = JSON.parse(data?.formData?.form || '{}');
-        inputValues.value = JSON.parse(data?.values?.values || '{}')
-
-
-        console.log("🚀 ~ fetchPciDssForm ~ pciDss:", pciDss)
-    } catch (err) {
-        console.log("🚀 ~ fetchPciDssForm ~ err:", err)
-        error.value = err.message;
-    }
 }
 
 const fetchEvidence = async () => {
@@ -127,7 +136,7 @@ const fetchEvidence = async () => {
 }
 
 onMounted(async () => {
-    await fetchMenu();
+    //await fetchMenu();
     await fetchPciDssForm(1);
 })
 

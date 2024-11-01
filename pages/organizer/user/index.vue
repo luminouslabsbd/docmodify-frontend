@@ -6,13 +6,18 @@ import { formatDate } from '~/utils/helper';
 import { deleteConfirmation } from '~/utils/helper';
 import Multiselect from '@suadelabs/vue3-multiselect';
 import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
+import { useTokenStore } from '~/stores/useTokenStore';
 
 
 useHead({ title: 'User' });
+definePageMeta({
+    middleware:['auth','admin']
+})
+
+
 const config = useRuntimeConfig();
 const isOpen = ref(false);
 const projects = ref([]);
-const users = ref([]);
 const errors = ref({});
 const page = ref(1);
 const perPage = ref(15);
@@ -46,32 +51,56 @@ const resetForm = () => {
     isEdit.value.id = null;
 };
 
-const getUsers = async () => {
-    const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/user`);
-    if (data.value) {
-        users.value = data.value;
-    }
-
-    if(status.value === 'error'){
-        console.log('Error ',error)
-    }
-};
-
-const getProjects = async () => {
-    const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/user-projects`);
-    if (status.value === 'success') {
-        options.value = data.value?.data;
-        isOpen.value = true
-    }
-
-    if(status.value === 'error'){
-        console.log('Error ',error)
-    }
+const createUser = () =>{
+    resetForm()
+    isOpen.value = true
 }
 
+const { data: users, error, pending, status, refresh } = useAsyncData(
+    'organizer_users',
+    () =>
+        $fetch('/organizer/user', {
+            baseURL: useRuntimeConfig().public.apiUrl,
+            method: 'GET',
+            params: {
+                page: page.value,
+                query: query.value,
+                perPage: perPage.value,
+            },
+            headers: {
+                Authorization: `Bearer ${useTokenStore().token}`,
+            },
+        }),
+    {
+        watch: [page, query, perPage],
+        cache: true,
+        immediate: true,
+    }
+)
+
+
+const { data: userProjects,refresh:userProjectRefresh} = useAsyncData(
+    'organizer_users_projects',
+    () =>
+        $fetch('/organizer/user-projects', {
+            baseURL: useRuntimeConfig().public.apiUrl,
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${useTokenStore().token}`,
+            },
+        }),
+    {
+        cache: true,
+        immediate: true,
+    }
+)
+
 const getUserById = async (id) => {
-    const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/user/${id}`);
-    await getProjects();
+    const { data, error, status } = await useApiFetch(`/organizer/user/${id}`, {
+        method: 'GET',
+    });
+    console.log("🚀 ~ getUserById ~ data:", data)
+
     if (status.value === 'error') {
         toast.error("Something want wrong!");
         console.log("🚀 ~ getOrganizerById ~ error:", error.value?.data)
@@ -93,24 +122,25 @@ const submitForm = async () => {
     try {
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
-            ? `${config.public.apiUrl}/organizer/user/${isEdit.value.id}`
-            : `${config.public.apiUrl}/organizer/user`;
+            ? `/organizer/user/${isEdit.value.id}`
+            : `/organizer/user`;
 
 
         const body = {
             ...form.value,
             projects:form.value.projects.map(project => project.id),
         }
-        const { data, error, pending, status } = await useFetch(url, {
+
+        const { data, error, pending, status } = await useApiFetch(url, {
             method,
-            body: body,
+            body: body
         });
 
         if (status.value === 'error') {
             errors.value = error.value?.data?.errors;
         }
         if (status.value === 'success') {
-            await getUsers();
+            await refresh();
             resetForm();
             isOpen.value = false;
             toast.success(data.value?.message)
@@ -125,7 +155,11 @@ const deleteUser = async (id) => {
     const result = await deleteConfirmation();
 
     if (result.isConfirmed) {
-        const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/user/${id}`, {
+        // const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/user/${id}`, {
+        //     method: 'DELETE',
+        // });
+
+        const { data, error, status } = await useApiFetch(`/organizer/user/${id}`, {
             method: 'DELETE',
         });
 
@@ -135,15 +169,11 @@ const deleteUser = async (id) => {
         }
 
         if (status.value === 'success') {
-            await getUsers();
+            await refresh();
             toast.success(data.value?.message);
         }
     }
 }
-
-onMounted(async () => {
-    await getUsers();
-});
 
 </script>
 
@@ -151,16 +181,17 @@ onMounted(async () => {
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
             <h5 class="text-lg font-semibold dark:text-white-light">All User - <small>{{ users?.data?.total }}</small></h5>
-            <button @click="getProjects()" type="button" class="btn btn-info btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ltr:mr-1.5 rtl:ml-1.5" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path
-                        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                    </path>
-                </svg>
-                Create
-            </button>
+            <div class="flex gap-3">
+                <input type="search" v-model="query" placeholder="Search..." class="form-input">
+                <button @click="createUser()" type="button" class="btn btn-info btn-sm space-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    <span>
+                        Create
+                    </span>
+                </button>
+            </div>
         </div>
         <div class="mb-5">
             <div class="table-responsive">
@@ -195,6 +226,71 @@ onMounted(async () => {
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="flex justify-between mt-3">
+                <div>
+                    <select v-model="perPage" id="" class="form-input">
+                        <option value="15">15</option>
+                        <option value="30">30</option>
+                        <option value="60">60</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <div>
+                    <ul class="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
+                        <li>
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                First
+                            </button>
+                        </li>
+                        <li v-for="(link, key) in organizers?.data?.links">
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                <span v-html="link?.label"></span>
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="
+                                flex
+                                justify-center
+                                font-semibold
+                                px-3.5
+                                py-2
+                                rounded
+                                transition
+                                bg-white-light
+                                text-dark
+                                hover:text-white hover:bg-primary
+                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
+                            ">
+                                Last
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
@@ -242,7 +338,7 @@ onMounted(async () => {
                         <label for="phone">Select Project<small class="text-red-500">*</small></label>
                         <Multiselect
                             v-model="form.projects"
-                            :options="options"
+                            :options="userProjects?.data"
                             :multiple="true"
                             placeholder="Select project"
                             :track-by="'id'"
