@@ -97,7 +97,11 @@ const onSubmit = async () => {
                     </div>
                     <div class="ltr:xl:-skew-x-[14deg] rtl:xl:skew-x-[14deg]">
                         <NuxtLink to="/" class="ms-10 block w-48 lg:w-72">
-                            <img src="/assets/images/auth/logo-white.svg" alt="Logo" class="w-full" />
+                            <!-- <img src="/assets/images/auth/logo-white.svg" alt="Logo" class="w-full" /> -->
+                             <div class="flex gap-2">
+                                <img class="ml-[5px] w-8 flex-none" src="/assets/images/logo_sm.png" alt="" />
+                                <span class="align-middle text-4xl font-bold ltr:ml-1.5 rtl:mr-1.5 text-white-light lg:inline">Docx Modify</span>
+                             </div>
                         </NuxtLink>
                         <div class="mt-24 hidden w-full max-w-[430px] lg:block">
                             <img src="/assets/images/auth/login.svg" alt="Cover Image" class="w-full" />
@@ -175,7 +179,7 @@ const onSubmit = async () => {
                         </form>
                     </div>
                     <p class="absolute bottom-6 w-full text-center dark:text-white">© {{ new Date().getFullYear()
-                        }}.VRISTO All Rights Reserved.</p>
+                        }}.Docx Modify All Rights Reserved.</p>
                 </div>
             </div>
         </div>

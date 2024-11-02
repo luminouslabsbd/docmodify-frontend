@@ -4,12 +4,10 @@ import { toast } from "vue3-toastify";
 import { useFetch } from '#app';
 import { formatDate } from '~/utils/helper';
 import { deleteConfirmation } from '~/utils/helper';
-import Multiselect from '@suadelabs/vue3-multiselect';
-import '@suadelabs/vue3-multiselect/dist/vue3-multiselect.css';
 import { useTokenStore } from '~/stores/useTokenStore';
 
 
-useHead({ title: 'User' });
+useHead({ title: 'User'});
 definePageMeta({
     middleware:['auth']
 })
@@ -109,7 +107,8 @@ const getUserById = async (id) => {
     if (status.value === 'success') {
         const userData = data.value?.data;
         form.value = userData;
-        form.projects = userData.projects.map(project => project.id);
+        // form.projects = userData.projects.map(project => project.id);
+        form.value.projects = userData.projects.map(project => project.id);
 
         isEdit.value.edit = true;
         isEdit.value.id = id;
@@ -128,7 +127,8 @@ const submitForm = async () => {
 
         const body = {
             ...form.value,
-            projects:form.value.projects.map(project => project.id),
+            // projects:form.value.projects.map(project => project.id), //Assign For Multiple Project
+            projects:[form.value.projects] //Assign For Single Project
         }
 
         const { data, error, pending, status } = await useApiFetch(url, {
@@ -175,6 +175,27 @@ const deleteUser = async (id) => {
     }
 }
 
+
+
+const getLastPage = computed(()=>{
+    let page = {
+        prevPage:null,
+        nextPage:null
+    }
+
+    if(users.value?.data?.next_page_url){
+        let nextpageurl = new URL(users.value.data.next_page_url);
+        page.nextPage  = nextpageurl.searchParams.get('page');
+    }
+
+    if(users.value?.data?.prev_page_url){
+        let prevpageurl = new URL(users.value.data.prev_page_url);
+        page.prevPage  = prevpageurl.searchParams.get('page');
+    }
+    return page;
+})
+
+
 </script>
 
 <template>
@@ -207,7 +228,7 @@ const deleteUser = async (id) => {
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="status === 'success'">
                         <tr v-for="(user, key) in users?.data?.data">
                             <td>{{ key + 1 }}</td>
                             <td class="whitespace-nowrap">{{ user?.name }}</td>
@@ -227,71 +248,15 @@ const deleteUser = async (id) => {
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-between mt-3">
-                <div>
-                    <select v-model="perPage" id="" class="form-input">
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="60">60</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div>
-                    <ul class="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
-                        <li>
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                First
-                            </button>
-                        </li>
-                        <li v-for="(link, key) in organizers?.data?.links">
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                <span v-html="link?.label"></span>
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                Last
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+
+            <Pagination
+                :status="status"
+                :perPage="perPage"
+                :pagination="{ prevPage: getLastPage.prevPage, nextPage: getLastPage.nextPage }"
+                @update:page="page = $event"
+                @update:perPage="perPage = $event"
+            />
+
         </div>
     </div>
 
@@ -334,7 +299,7 @@ const deleteUser = async (id) => {
                         <p v-if="errors?.password" class="text-red-500">{{ errors?.password[0] }}</p>
                     </div>
 
-                    <div>
+                    <!-- <div>
                         <label for="phone">Select Project<small class="text-red-500">*</small></label>
                         <Multiselect
                             v-model="form.projects"
@@ -344,10 +309,18 @@ const deleteUser = async (id) => {
                             :track-by="'id'"
                             :label="'name'"
                         />
-                    </div>
+                    </div> -->
 
                     <div>
-                        <button type="submit" :disabled="status === 'pending'" class="btn btn-info" :class="{'btn-danger' : status === 'pending'}">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
+                        <label class="flex gap-6 items-center" v-for="(project, key) in userProjects?.data" :for="`project-${key}`">
+                            <input type="radio" :id="`project-${key}`" :name="`project-name${key}`" v-model="form.projects" :value="project.id">
+                            <span>{{ project.name }}</span>
+                        </label>
+                    </div>
+
+
+                    <div>
+                        <button type="submit" class="btn btn-info">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
                     </div>
                 </div>
             </form>

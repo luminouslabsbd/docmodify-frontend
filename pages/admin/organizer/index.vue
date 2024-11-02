@@ -14,9 +14,6 @@ definePageMeta({
 
 const isOpen = ref(false);
 const errors = ref({});
-const page = ref(1);
-const perPage = ref(15);
-const query = ref('');
 
 const isEdit = ref({
     edit: false,
@@ -51,6 +48,10 @@ const createOrganizer = () => {
     isOpen.value = true
 }
 
+
+const page = ref(1);
+const perPage = ref(15);
+const query = ref('');
 const { data: organizers, error, pending, status, refresh } = useAsyncData(
     'admin_organizers',
     () =>
@@ -139,12 +140,29 @@ const deleteOrganizer = async (id) => {
     }
 }
 
+const getLastPage = computed(()=>{
+    let page = {
+        prevPage:null,
+        nextPage:null
+    }
+
+    if(organizers.value?.data?.next_page_url){
+        let nextpageurl = new URL(organizers.value.data.next_page_url);
+        page.nextPage  = nextpageurl.searchParams.get('page');
+    }
+
+    if(organizers.value?.data?.prev_page_url){
+        let prevpageurl = new URL(organizers.value.data.prev_page_url);
+        page.prevPage  = prevpageurl.searchParams.get('page');
+    }
+    return page;
+})
 </script>
 
 <template>
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">All Users - {{ organizers?.data?.total }}</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">All Organizer - {{ organizers?.data?.data.total }}</h5>
             <div class="flex gap-3">
                 <input type="search" v-model="query" placeholder="Search..." class="form-input">
                 <button @click="createOrganizer()" type="button" class="btn btn-info btn-sm space-x-1">
@@ -170,9 +188,9 @@ const deleteOrganizer = async (id) => {
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="status === 'success'">
                         <tr v-for="(organizer, key) in organizers?.data?.data">
-                            <td>{{ key + 1 }}</td>
+                            <td>{{ organizer?.id }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.name }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.phone }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.email }}</td>
@@ -189,72 +207,15 @@ const deleteOrganizer = async (id) => {
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-between mt-3">
-                <div>
-                    <select v-model="perPage" id="" class="form-input">
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="60">60</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div>
-                    <ul class="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
-                        <li>
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                First
-                            </button>
-                        </li>
-                        <li v-for="(link, key) in organizers?.data?.links">
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                <span v-html="link?.label"></span>
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                Last
-                            </button>
-                        </li>
-                    </ul>
 
-                </div>
-            </div>
+
+            <Pagination
+                :status="status"
+                :perPage="perPage"
+                :pagination="{ prevPage: getLastPage.prevPage, nextPage: getLastPage.nextPage }"
+                @update:page="page = $event"
+                @update:perPage="perPage = $event"
+            />
         </div>
     </div>
 

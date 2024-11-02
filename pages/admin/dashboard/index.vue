@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { useTokenStore } from '~/stores/useTokenStore';
     definePageMeta({
-        middleware:['auth'],
-        role:authType.ADMIN
+        middleware:['auth']
     })
     useHead({ title: 'Analytics' });
 

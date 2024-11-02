@@ -9,7 +9,7 @@ import { useTokenStore } from '~/stores/useTokenStore';
 
 useHead({title:'Project'})
 definePageMeta({
-    middleware:['auth','admin']
+    middleware:['auth']
 })
 
 const config = useRuntimeConfig();
@@ -133,6 +133,26 @@ const deleteProject = async (id) => {
         }
     }
 }
+
+
+
+const getLastPage = computed(()=>{
+    let page = {
+        prevPage:null,
+        nextPage:null
+    }
+
+    if(projects.value?.data?.next_page_url){
+        let nextpageurl = new URL(projects.value.data.next_page_url);
+        page.nextPage  = nextpageurl.searchParams.get('page');
+    }
+
+    if(projects.value?.data?.prev_page_url){
+        let prevpageurl = new URL(projects.value.data.prev_page_url);
+        page.prevPage  = prevpageurl.searchParams.get('page');
+    }
+    return page;
+})
 </script>
 
 <template>
@@ -163,7 +183,7 @@ const deleteProject = async (id) => {
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody v-if="status === 'success'">
                         <tr v-for="(project, key) in projects?.data?.data">
                             <td>{{ key + 1 }}</td>
                             <td class="whitespace-nowrap">{{ project?.name }}</td>
@@ -181,71 +201,14 @@ const deleteProject = async (id) => {
                     </tbody>
                 </table>
             </div>
-            <div class="flex justify-between mt-3">
-                <div>
-                    <select v-model="perPage" id="" class="form-input">
-                        <option value="15">15</option>
-                        <option value="30">30</option>
-                        <option value="60">60</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <div>
-                    <ul class="inline-flex items-center space-x-1 rtl:space-x-reverse m-auto mb-4">
-                        <li>
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                First
-                            </button>
-                        </li>
-                        <li v-for="(link, key) in organizers?.data?.links">
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                <span v-html="link?.label"></span>
-                            </button>
-                        </li>
-                        <li>
-                            <button type="button" class="
-                                flex
-                                justify-center
-                                font-semibold
-                                px-3.5
-                                py-2
-                                rounded
-                                transition
-                                bg-white-light
-                                text-dark
-                                hover:text-white hover:bg-primary
-                                dark:text-white-light dark:bg-[#191e3a] dark:hover:bg-primary
-                            ">
-                                Last
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
+
+            <Pagination
+                :status="status"
+                :perPage="perPage"
+                :pagination="{ prevPage: getLastPage.prevPage, nextPage: getLastPage.nextPage }"
+                @update:page="page = $event"
+                @update:perPage="perPage = $event"
+            />
         </div>
     </div>
 

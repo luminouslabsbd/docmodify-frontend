@@ -7,9 +7,12 @@ import Evidence from "~/components/evidence/Evidence.vue";
 import { tabs } from "~/utils/helper";
 import { useTokenStore } from "~/stores/useTokenStore";
 
+definePageMeta({
+    middleware:['auth','role']
+})
+
 useHead({ title: 'Assessment' });
-const config = useRuntimeConfig();
-const { authUser } = useTokenStore()
+
 
 const defaultValues = ref({
     descriptionTitle: "Requirement Description",
@@ -23,23 +26,10 @@ const defaultValues = ref({
 
 const selectedTab = ref(tabs.DOCUMENT);
 const route = useRoute();
-const error = ref(null);
-//const pciDss = ref({});
-
-//const pciDssEs = ref([]);
-
 const inputValues = ref({});
-const selectedIds = reactive({
-    requirement_id: null,
-    description_id: null,
-    pci_dss_id: null,
-    project_id: route.params?.id,
-})
 const isOpen = ref(false);
 const evidences = ref([]);
-
-
-
+const requirementId = ref(1)
 const { data: menus, refresh: menuRefresh } = useAsyncData(
     'user_menus',
     () =>
@@ -56,28 +46,68 @@ const { data: menus, refresh: menuRefresh } = useAsyncData(
     }
 )
 
-
-const requirementId = ref(1)
 const setRequirementId = (id) => {
     requirementId.value = id;
 }
 
 
-const { data, refresh } = await useApiFetch('/user/get-form', {
-    method: 'POST',
-    immediate: true,
-    watch: [requirementId],
-    body: {
-        requirementId,
-        projectId:route.params.id,
-    }
-}, {
-    watch: [requirementId]
-});
+// const { data, refresh } = await useApiFetch('/user/get-form', {
+//     method: 'POST',
+//     immediate: true,
+//     watch: [requirementId],
+//     body: {
+//         requirementId,
+//         projectId:route.params.id,
+//     }
+// }, {
+//     watch: [requirementId]
+// });
+
+// watch(data.value, (value)=>{
+//     console.log("data", data)
+//     console.log("watch value", value)
+// })
 
 // if(data.value){
+
+//     console.log(data.value)
 //     inputValues.value = JSON.parse(data.value?.values);
-//}
+// }
+
+
+
+const { data , refresh, pending:getFrompending , status:getFromStatus} = await useApiFetch('/user/get-form', {
+  method: 'POST',
+  immediate: true,
+  body: {
+    requirementId,
+    projectId: route.params.id,
+  }
+}, {
+  watch: [requirementId]
+});
+
+// Watch for changes in `data` and update `inputValues`
+watch(data, (newData) => {
+  if (newData?.values) {
+    try {
+      inputValues.value = JSON.parse(newData.values);
+    } catch (error) {
+      console.error("Failed to parse `values` in data:", error);
+      inputValues.value = {}; // reset to empty object if parsing fails
+    }
+  }
+}, { immediate: true }); // immediate: true to apply it on initial load as well
+
+// Optional: Watch for changes in `requirementId` and refresh `data`
+watch(requirementId, () => {
+  refresh(); // Trigger API refetch when `requirementId` changes
+});
+
+
+
+
+
 
 
 const submitForm = async () => {
@@ -129,11 +159,9 @@ const fetchEvidence = async () => {
 
 // menu active and de-active system using by key
 
-const activeRequirement = ref('reqid_1')
-const activeDescription = ref('desc_1')
-const activePciDss = ref("pcidss_1")
-
-
+const activeRequirement = ref(0)
+const activeDescription = ref(0)
+const activePciDss = ref(0)
 
 
 </script>
@@ -155,29 +183,32 @@ const activePciDss = ref("pcidss_1")
         <div class="flex justify-between">
             <div class="w-3/12 p-4">
                 <ul class="max-h-screen h-full overflow-y-scroll menu-scroll">
-                    <li v-for="(requirement, reqIndex) in menus" :key="'req_key_' + reqIndex">
+                    <li v-for="(requirement, reqIndex) in menus"
+                        @click="activeRequirement = requirement.id"
+                        :key="'req_key_' + reqIndex">
 
                         <h3 class="font-bold bg-gray-300 dark:bg-slate-800 px-3 py-2 mb-1 rounded-sm cursor-pointer"
-                            :class="{ 'bg-info text-white': requirement.id === data.requirement_id }">
+                        :class="{'bg-info text-white': requirement.id === activeRequirement}">
                             {{ requirement?.title }}
                         </h3>
 
-                        <ul class="ml-3">
+                        <ul class="ml-3" v-if="requirement.id === activeRequirement">
                             <li v-for="(description, descIndex) in requirement?.descriptions"
-                                @click.stop="activeDescription = 'desc_' + description?.id"
+                                @click="activeDescription = description.id"
                                 :key="'desc_key_' + descIndex">
 
                                 <h3 class="px-2 py-1 mb-1 bg-gray-200 dark:bg-slate-800/75 rounded-sm cursor-pointer"
-                                    :class="{ 'bg-info text-white': description.id === data.description_id }"
+                                    :class="{'bg-info text-white': description.id === activeDescription}"
                                     v-html="description?.title">
                                 </h3>
 
-                                <ul class="ml-6">
+                                <ul class="ml-6" v-if="description.id === activeDescription">
                                     <li v-for="(pciDss, pciIndex) in description?.pci_dss"
-                                        @click.stop="setRequirementId(pciDss?.id)" :key="'pcidss_key_' + pciIndex">
+                                        @click.stop="setRequirementId(pciDss?.id)"
+                                        :key="'pcidss_key_' + pciIndex">
 
                                         <h3 class="px-2 py-1 bg-gray-100 dark:bg-slate-700 mb-2 rounded-sm cursor-pointer hover:bg-info hover:text-white"
-                                            :class="{ 'bg-info text-white': pciDss.id === data.id }">
+                                        :class="{'bg-info text-white': pciDss.id === data.id}">
                                             {{ pciDss?.key }}
                                         </h3>
                                     </li>
@@ -188,7 +219,13 @@ const activePciDss = ref("pcidss_1")
                 </ul>
             </div>
             <div class="w-9/12 p-4">
-                <form @submit.prevent="submitForm">
+                <div class="h-full flex items-start justify-center mt-10" v-if="getFromStatus === 'pending'">
+                    <div class="flex items-center flex-col">
+                        <SklitonLoader/>
+                        <p class="text-lg font-bold">Please Wait</p>
+                    </div>
+                </div>
+                <form @submit.prevent="submitForm" v-if="getFromStatus === 'success'">
                     <h2 class="text-2xl font-bold">{{ data?.description?.requirement?.title }}</h2>
                     <div class="">
                         <div v-if="JSON.parse(data?.description?.form)?.assignment">
@@ -238,7 +275,8 @@ const activePciDss = ref("pcidss_1")
                                                 <td style="border: 1px solid;" class="text-dark">{{ row?.title }}</td>
                                                 <td style="border: 1px solid;" class="text-dark"
                                                     v-for="(td, key) in row?.inputs">
-                                                    <input type="hidden" :name="td?.name"
+                                                    <input type="hidden"
+                                                        :name="td?.name"
                                                         :value="defaultValues.notChecked" />
                                                     <input type="checkbox" :name="td?.name"
                                                         :checked="(inputValues[td?.name] && inputValues[td?.name] === '☒')"
@@ -637,13 +675,16 @@ const activePciDss = ref("pcidss_1")
                                                 <td class="border border-slate-900 p-2">
                                                     <div class="d-flex gap-2">
                                                         <div class="flex gap-3">
-                                                            <input type="hidden" :name="'assessedEntityInitialPciDssAssessment_5_1'"
+                                                            <input type="hidden"
+                                                            :name="'assessedEntityInitialPciDssAssessment_5_1'"
                                                             :value="defaultValues.notChecked" />
 
-                                                            <input type="checkbox" :name="row?.names[2]"
+                                                            <input type="checkbox"
+                                                                :name="'assessedEntityInitialPciDssAssessment_5_1'"
                                                                 class="form-check-input border border-secondary text-center w-4 h-4"
                                                                 :checked="(inputValues['assessedEntityInitialPciDssAssessment_5_1'] && inputValues['assessedEntityInitialPciDssAssessment_5_1'] == '☒')"
-                                                                :value="defaultValues.checked" />
+                                                                :value="defaultValues.checked"
+                                                                />
                                                             <label for="assessedEntityInitialPciDssAssessment_5_1_yes">Yes</label>
                                                         </div>
 
@@ -651,7 +692,8 @@ const activePciDss = ref("pcidss_1")
                                                             <input type="hidden" :name="'assessedEntityInitialPciDssAssessment_5_1'"
                                                             :value="defaultValues.notChecked" />
 
-                                                            <input type="checkbox" :name="row?.names[2]"
+                                                            <input type="checkbox"
+                                                                :name="'assessedEntityInitialPciDssAssessment_5_1'"
                                                                 class="form-check-input border border-secondary text-center w-4 h-4"
                                                                 :checked="(inputValues['assessedEntityInitialPciDssAssessment_5_1'] && inputValues['assessedEntityInitialPciDssAssessment_5_1'] == '☒')"
                                                                 :value="defaultValues.checked" />
@@ -688,10 +730,12 @@ const activePciDss = ref("pcidss_1")
                                                 <td class="border border-slate-900 p-2" >
                                                     <div class="d-flex gap-2">
                                                         <div class="flex gap-3">
-                                                            <input type="hidden" :name="'attestationsScanComplianceConfirming_5_2'"
+                                                            <input type="hidden"
+                                                            :name="'attestationsScanComplianceConfirming_5_2'"
                                                             :value="defaultValues.notChecked" />
 
-                                                            <input type="checkbox" :name="row?.names[2]"
+                                                            <input type="checkbox"
+                                                                :name="'attestationsScanComplianceConfirming_5_2'"
                                                                 class="form-check-input border border-secondary text-center w-4 h-4"
                                                                 :checked="(inputValues['attestationsScanComplianceConfirming_5_2'] && inputValues['attestationsScanComplianceConfirming_5_2'] == '☒')"
                                                                 :value="defaultValues.checked" />
@@ -699,10 +743,12 @@ const activePciDss = ref("pcidss_1")
                                                         </div>
 
                                                         <div class="flex gap-3">
-                                                            <input type="hidden" :name="'attestationsScanComplianceConfirming_5_2'"
+                                                            <input type="hidden"
+                                                            :name="'attestationsScanComplianceConfirming_5_2'"
                                                             :value="defaultValues.notChecked" />
 
-                                                            <input type="checkbox" :name="row?.names[2]"
+                                                            <input type="checkbox"
+                                                                :name="'attestationsScanComplianceConfirming_5_2'"
                                                                 class="form-check-input border border-secondary text-center w-4 h-4"
                                                                 :checked="(inputValues['attestationsScanComplianceConfirming_5_2'] && inputValues['attestationsScanComplianceConfirming_5_2'] == '☒')"
                                                                 :value="defaultValues.checked" />
@@ -744,13 +790,15 @@ const activePciDss = ref("pcidss_1")
                                                         <input type="hidden" :name="td"
                                                             :value="defaultValues.notChecked" />
 
-                                                            <input type="checkbox" :name="row?.names[2]"
+                                                            <input type="checkbox"
+                                                                :name="row?.names[2]"
                                                                 class="form-check-input border border-secondary text-center w-4 h-4"
                                                                 :checked="(inputValues[td] && inputValues[td] == '☒')"
                                                                 :value="defaultValues.checked" />
                                                     </div>
                                                     <div v-else>
-                                                        <input type="text" class="form-input"
+                                                        <input type="text"
+                                                                class="form-input"
                                                                 :value="inputValues[td] ?? defaultValues.placeholder"
                                                                 :name="td" />
                                                     </div>
