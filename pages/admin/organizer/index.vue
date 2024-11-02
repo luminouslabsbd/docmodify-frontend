@@ -260,9 +260,9 @@ const deleteOrganizer = async (id) => {
 
     <div :class="[
         isOpen ? 'translate-x-0' : 'translate-x-full',
-        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white shadow-lg transition-transform duration-300 ease-in-out',
+        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
     ]">
-        <div class="flex items-center justify-between bg-gray-50 p-4">
+        <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
             <h2 class="text-2xl font-semibold">{{ isEdit.edit ? "Edit" : "Create" }} Organizer</h2>
             <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
         </div>
