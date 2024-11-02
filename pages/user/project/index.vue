@@ -35,6 +35,21 @@ const { data: projects, error, pending, status, refresh } = useAsyncData(
     }
 )
 
+
+const downloadDocx = async (id) => {
+    try {
+        const {data} = await useApiFetch(`/user/generate-docx/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            },
+        });
+        window.location = data.value.downloadUrl
+    } catch (error) {
+        console.error("Docx Generate Error:", error);
+    }
+};
+
 </script>
 <template>
     <div class="panel">
@@ -66,7 +81,7 @@ const { data: projects, error, pending, status, refresh } = useAsyncData(
                             <td>
                                 <div class="flex gap-3">
                                     <NuxtLink :to="`/user/assignment/${project?.id}`" class="btn btn-info btn-sm"> Modify</NuxtLink>
-                                    <button class="btn btn-info btn-sm">Download</button>
+                                    <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm">Download</button>
                                 </div>
                             </td>
                         </tr>

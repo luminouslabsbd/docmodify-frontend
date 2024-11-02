@@ -1,8 +1,8 @@
 export default defineNuxtConfig({
     app: {
         head: {
-            title: 'Sales Admin | VRISTO - Multipurpose Tailwind Dashboard Template',
-            titleTemplate: '%s | VRISTO - Multipurpose Tailwind Dashboard Template',
+            title: 'Login | Docx Modification',
+            titleTemplate: '%s | Docx Modification',
             htmlAttrs: {
                 lang: 'en',
             },
@@ -16,7 +16,7 @@ export default defineNuxtConfig({
                 { name: 'format-detection', content: 'telephone=no' },
             ],
             link: [
-                { rel: 'icon', type: 'image/x-icon', href: '/favicon.png' },
+                { rel: 'icon', type: 'image/x-icon', href: '/assets/images/logo_sm.png' },
                 {
                     rel: 'stylesheet',
                     href: 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap',

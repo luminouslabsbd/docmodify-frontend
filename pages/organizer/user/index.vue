@@ -11,7 +11,7 @@ import { useTokenStore } from '~/stores/useTokenStore';
 
 useHead({ title: 'User' });
 definePageMeta({
-    middleware:['auth','admin']
+    middleware:['auth']
 })
 
 
@@ -347,7 +347,7 @@ const deleteUser = async (id) => {
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-info">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
+                        <button type="submit" :disabled="status === 'pending'" class="btn btn-info" :class="{'btn-danger' : status === 'pending'}">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
                     </div>
                 </div>
             </form>
