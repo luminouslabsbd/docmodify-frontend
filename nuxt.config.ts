@@ -25,11 +25,6 @@ export default defineNuxtConfig({
         },
     },
 
-    routeRules:{
-        '/admin/**': { appMiddleware:'role' },
-        '/user/**': { appMiddleware: 'role' },
-        '/organizer/**': { appMiddleware: 'role' }
-      },
 
     css: [
         '~/assets/css/app.css',

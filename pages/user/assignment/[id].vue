@@ -8,7 +8,7 @@ import { tabs } from "~/utils/helper";
 import { useTokenStore } from "~/stores/useTokenStore";
 
 definePageMeta({
-    middleware:['auth','role']
+    middleware:['auth']
 })
 
 useHead({ title: 'Assessment' });

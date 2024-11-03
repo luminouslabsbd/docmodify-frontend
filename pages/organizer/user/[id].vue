@@ -4,7 +4,7 @@
     import { useRoute } from '~/.nuxt/vue-router';
     import { toast } from "vue3-toastify";
 
-    useHead({title:'Project'})
+    useHead({title:'User Project'})
     definePageMeta({
         middleware:['auth']
     })

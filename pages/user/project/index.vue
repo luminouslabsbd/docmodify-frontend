@@ -4,7 +4,7 @@
 
     useHead({title:'Project'})
     definePageMeta({
-        middleware:['auth','role']
+        middleware:['auth']
     })
 
     const page = ref(1);
