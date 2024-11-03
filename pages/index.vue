@@ -43,7 +43,7 @@ const onSubmit = async () => {
     errors.value = error?.value?.data
     console.log("🚀 ~ onSubmit ~ errors:", errors.value)
     if (error?.value) {
-        toast.error(error?.value?.data ?? "Have An Error, Please Try Again...")
+        toast.error('Something went wrong...!')
     }
     if (!error.value) {
         setToken(data.value)
