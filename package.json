@@ -2,11 +2,13 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "start": "nuxt dev",
         "build": "nuxt build",
-        "dev": "nuxt dev",
+        "dev": "PORT=3030 nuxt dev",
         "generate": "nuxt generate",
         "preview": "nuxt preview",
-        "postinstall": "nuxt prepare"
+        "postinstall": "nuxt prepare",
+        "live": "PORT=3030 node .output/server/index.mjs"
     },
     "devDependencies": {
         "@nuxt/devtools": "^1.6.0",
