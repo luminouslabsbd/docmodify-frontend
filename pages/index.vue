@@ -26,8 +26,8 @@ const { setLocale } = useI18n();
 const { setToken, setAuthUser } = useTokenStore();
 const form = ref()
 const state = reactive({
-    email: 'docmodify.admin@gmail.com',//undefined,
-    password: 'Z.t$jf_>CU{]Sg*6wB2?}5',//undefined,
+    email: '',//undefined,
+    password: '',//undefined,
     remember: false
 })
 
