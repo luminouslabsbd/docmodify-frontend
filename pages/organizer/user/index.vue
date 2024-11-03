@@ -237,7 +237,8 @@ const getLastPage = computed(()=>{
                             <td class="whitespace-nowrap">{{ user?.projects?.length ?? 0 }}</td>
                             <td class="whitespace-nowrap">{{ formatDate(user?.created_at) }}</td>
                             <td>
-                                <div class="flex gap-3">
+                                <div class="flex gap-1">
+                                    <NuxtLink :to="`/organizer/user/${user?.id}`" class="btn btn-sm btn-info">View</NuxtLink>
                                     <button class="btn btn-sm btn-info"
                                         @click="getUserById(user.id)">Edit</button>
                                     <button class="btn btn-sm btn-danger"

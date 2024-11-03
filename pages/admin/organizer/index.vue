@@ -196,7 +196,7 @@ const getLastPage = computed(()=>{
                             <td class="whitespace-nowrap">{{ organizer?.email }}</td>
                             <td class="w-[25%]">{{ organizer?.organization?.address }}</td>
                             <td>
-                                <div class="flex gap-3">
+                                <div class="flex gap-2">
                                     <button class="btn btn-sm btn-info"
                                         @click="getOrganizerById(organizer.id)">Edit</button>
                                     <button class="btn btn-sm btn-danger"
