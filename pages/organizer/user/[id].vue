@@ -12,7 +12,7 @@
     const page = ref(1);
     const perPage = ref(15);
     const query = ref('');
-    const isDownloading = ref(false);
+    const isDownloading = ref(null);
     const loadingProjectId = ref(null);
     const route = useRoute();
     const isOpen = ref(false);
@@ -40,7 +40,7 @@
     )
 
     const downloadDocx = async (id) => {
-        isDownloading.value = true;
+        isDownloading.value = id;
         try {
             const {data} = await useApiFetch(`/user/generate-docx/${id}`, {
                 method: 'GET',
@@ -49,10 +49,10 @@
                 },
             });
             window.location = data.value.downloadUrl
-            isDownloading.value = false;
+            isDownloading.value = null;
         } catch (error) {
             console.error("Docx Generate Error:", error);
-            isDownloading.value = false;
+            isDownloading.value = null;
         }
     };
 
@@ -145,12 +145,12 @@
                             <td>{{  project?.description }}</td>
                             <td>
                                 <div class="flex gap-3">
-                                    <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading">
-                                        <span v-if="isDownloading" class="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white !border-l-transparent dark:border-black"></span>
-                                        <span>{{ isDownloading? 'Downloading...' : 'Download'}}</span>
+                                    <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
+                                        <span v-if="isDownloading === project?.id" class="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white !border-l-transparent dark:border-black"></span>
+                                        <span>{{ isDownloading === project?.id? 'Downloading...' : 'Download'}}</span>
                                     </button>
 
-                                    <button @click="removeFormProject(project?.id)" class="btn btn-danger btn-sm flex gap-2" :disabled="isDownloading">
+                                    <button @click="removeFormProject(project?.id)" class="btn btn-danger btn-sm flex gap-2">
                                        Remove Form Project
                                     </button>
                                 </div>

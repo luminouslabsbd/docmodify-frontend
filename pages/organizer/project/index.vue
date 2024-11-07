@@ -12,8 +12,8 @@ definePageMeta({
     middleware:['auth']
 })
 
-const config = useRuntimeConfig();
 const isOpen = ref(false);
+const isLoading = ref(false);
 const errors = ref({});
 const page = ref(1);
 const perPage = ref(15);
@@ -88,6 +88,7 @@ const getProjectById = async (id) => {
 
 const submitForm = async () => {
     errors.value = {};
+    isLoading.value = true;
     try {
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
@@ -106,6 +107,7 @@ const submitForm = async () => {
             await refresh();
             resetForm();
             isOpen.value = false;
+            isLoading.value = false;
             toast.success(data.value?.message)
         }
     } catch (error) {

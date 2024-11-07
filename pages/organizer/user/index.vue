@@ -20,8 +20,7 @@ const errors = ref({});
 const page = ref(1);
 const perPage = ref(15);
 const query = ref('');
-const options = ref([]);
-const selectedOptions = ref([]);
+const selectedOptions = ref(null);
 
 const isEdit = ref({
     edit: false,
@@ -33,7 +32,7 @@ const form = ref({
     email: '',
     phone:'',
     password:'',
-    projects:[],
+    project:'',
 });
 
 const resetForm = () => {
@@ -42,7 +41,7 @@ const resetForm = () => {
         email: '',
         phone:'',
         password:'',
-        projects:[],
+        project:'',
     };
     errors.value = {};
     isEdit.value.edit = false;
@@ -155,10 +154,6 @@ const deleteUser = async (id) => {
     const result = await deleteConfirmation();
 
     if (result.isConfirmed) {
-        // const { data, error, status } = await useFetch(`${config.public.apiUrl}/organizer/user/${id}`, {
-        //     method: 'DELETE',
-        // });
-
         const { data, error, status } = await useApiFetch(`/organizer/user/${id}`, {
             method: 'DELETE',
         });
@@ -313,12 +308,20 @@ const getLastPage = computed(()=>{
                     </div> -->
 
                     <div>
+                        <label for="phone" :value="project.id">Select Project<small class="text-red-500">*</small></label>
+                        <select name="" id="" class="form-input" v-model="form.project">
+                            <option value="" selected disabled >Select one project</option>
+                            <option value="" v-for="(project, key) in userProjects?.data">{{ project.name  }}</option>
+                        </select>
+                        <p v-if="errors?.phone" class="text-red-500">{{ errors?.phone[0] }}</p>
+                    </div>
+
+                    <!-- <div>
                         <label class="flex gap-6 items-center" v-for="(project, key) in userProjects?.data" :for="`project-${key}`">
                             <input type="radio" :id="`project-${key}`" :name="`project-name${key}`" v-model="form.projects" :value="project.id">
                             <span>{{ project.name }}</span>
                         </label>
-                    </div>
-
+                    </div> -->
 
                     <div>
                         <button type="submit" class="btn btn-info">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>

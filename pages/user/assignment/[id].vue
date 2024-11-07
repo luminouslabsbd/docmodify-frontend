@@ -129,7 +129,7 @@ const submitForm = async () => {
         });
 
         console.log("🚀 ~ submitForm ~ data:", pciDssSubmit.value)
-        toast.success("Docx data create or update success!")
+        toast.success("Docx data create or update success!");
     } catch (error) {
         console.error("Error submitting form:", error);
     }

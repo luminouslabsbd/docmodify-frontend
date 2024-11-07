@@ -5,6 +5,7 @@ import { useAsyncData } from '#app';
 import { useFetch } from '#app';
 import { useApiFetch } from '~/composables/useApiFetch';
 import { useTokenStore } from '~/stores/useTokenStore';
+import ButtonLoader from '~/components/ButtonLoader.vue';
 
 useHead({ title: 'Organizer' })
 definePageMeta({
@@ -14,6 +15,7 @@ definePageMeta({
 
 const isOpen = ref(false);
 const errors = ref({});
+const isLoading = ref(false);
 
 const isEdit = ref({
     edit: false,
@@ -74,6 +76,7 @@ const { data: organizers, error, pending, status, refresh } = useAsyncData(
     }
 )
 
+console.log("🚀 ~ organizers:", organizers?.value)
 
 const getOrganizerById = async (id) => {
     const { data, error, status } = await useApiFetch(`/admin/organizer/${id}`, {
@@ -94,8 +97,8 @@ const getOrganizerById = async (id) => {
 }
 
 const submitForm = async () => {
-
     try {
+        isLoading.value = true;
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
             ? `/admin/organizer/${isEdit.value.id}`
@@ -112,6 +115,7 @@ const submitForm = async () => {
             await refresh();
             resetForm();
             isOpen.value = false;
+            isLoading.value = false;
             toast.success(data.value?.message)
         }
     } catch (error) {
@@ -146,23 +150,25 @@ const getLastPage = computed(()=>{
         nextPage:null
     }
 
-    if(organizers.value?.data?.next_page_url){
-        let nextpageurl = new URL(organizers.value.data.next_page_url);
+    if(organizers?.value?.data?.organizers?.next_page_url){
+        let nextpageurl = new URL(organizers?.value?.data?.organizers?.next_page_url);
         page.nextPage  = nextpageurl.searchParams.get('page');
     }
 
-    if(organizers.value?.data?.prev_page_url){
-        let prevpageurl = new URL(organizers.value.data.prev_page_url);
+    if(organizers?.value?.data?.organizers?.prev_page_url){
+        let prevpageurl = new URL(organizers?.value?.data?.organizers?.prev_page_url);
         page.prevPage  = prevpageurl.searchParams.get('page');
     }
     return page;
 })
+
+
 </script>
 
 <template>
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">All Organizer - {{ organizers?.data?.data.total }}</h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">All Organizer - {{ organizers?.data?.total }}</h5>
             <div class="flex gap-3">
                 <input type="search" v-model="query" placeholder="Search..." class="form-input">
                 <button @click="createOrganizer()" type="button" class="btn btn-info btn-sm space-x-1">
@@ -180,7 +186,7 @@ const getLastPage = computed(()=>{
                 <table>
                     <thead>
                         <tr>
-                            <th>#SL</th>
+                            <th>#ID</th>
                             <th>Name</th>
                             <th>Phone Number</th>
                             <th>Email Address</th>
@@ -189,7 +195,7 @@ const getLastPage = computed(()=>{
                         </tr>
                     </thead>
                     <tbody v-if="status === 'success'">
-                        <tr v-for="(organizer, key) in organizers?.data?.data">
+                        <tr v-for="(organizer, key) in organizers?.data?.organizers?.data">
                             <td>{{ organizer?.id }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.name }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.phone }}</td>
@@ -273,7 +279,10 @@ const getLastPage = computed(()=>{
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-info">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
+                        <button type="submit" class="btn btn-info" :disabled="isLoading">
+                            <ButtonLoader :isLoading="isLoading" />
+                            {{ isEdit.edit ? 'Update' : 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </form>
