@@ -6,6 +6,7 @@ import { TabGroup, TabList, Tab, TabPanels, TabPanel } from '@headlessui/vue';
 import Evidence from "~/components/evidence/Evidence.vue";
 import { tabs } from "~/utils/helper";
 import { useTokenStore } from "~/stores/useTokenStore";
+import ButtonLoader from "~/components/ButtonLoader.vue";
 
 definePageMeta({
     middleware:['auth']
@@ -25,6 +26,7 @@ const defaultValues = ref({
 });
 
 const selectedTab = ref(tabs.DOCUMENT);
+const isLoading = ref(false);
 const route = useRoute();
 const inputValues = ref({});
 const isOpen = ref(false);
@@ -51,32 +53,8 @@ const setRequirementId = (id) => {
 }
 
 
-// const { data, refresh } = await useApiFetch('/user/get-form', {
-//     method: 'POST',
-//     immediate: true,
-//     watch: [requirementId],
-//     body: {
-//         requirementId,
-//         projectId:route.params.id,
-//     }
-// }, {
-//     watch: [requirementId]
-// });
 
-// watch(data.value, (value)=>{
-//     console.log("data", data)
-//     console.log("watch value", value)
-// })
-
-// if(data.value){
-
-//     console.log(data.value)
-//     inputValues.value = JSON.parse(data.value?.values);
-// }
-
-
-
-const { data , refresh, pending:getFrompending , status:getFromStatus} = await useApiFetch('/user/get-form', {
+const { data , refresh, pending:getFromPending , status:getFromStatus, refresh:fromRefresh} = await useApiFetch('/user/get-form', {
   method: 'POST',
   immediate: true,
   body: {
@@ -87,21 +65,19 @@ const { data , refresh, pending:getFrompending , status:getFromStatus} = await u
   watch: [requirementId]
 });
 
-// Watch for changes in `data` and update `inputValues`
 watch(data, (newData) => {
   if (newData?.values) {
     try {
       inputValues.value = JSON.parse(newData.values);
     } catch (error) {
       console.error("Failed to parse `values` in data:", error);
-      inputValues.value = {}; // reset to empty object if parsing fails
+      inputValues.value = {};
     }
   }
-}, { immediate: true }); // immediate: true to apply it on initial load as well
+}, { immediate: true });
 
-// Optional: Watch for changes in `requirementId` and refresh `data`
 watch(requirementId, () => {
-  refresh(); // Trigger API refetch when `requirementId` changes
+  refresh();
 });
 
 
@@ -111,6 +87,7 @@ watch(requirementId, () => {
 
 
 const submitForm = async () => {
+    isLoading.value = true;
     const formData = new FormData(event.target);
     const pciDss = {};
     formData.forEach((value, key) => {
@@ -128,8 +105,9 @@ const submitForm = async () => {
             }),
         });
 
-        console.log("🚀 ~ submitForm ~ data:", pciDssSubmit.value)
+        isLoading.value = false;
         toast.success("Docx data create or update success!");
+        fromRefresh()
     } catch (error) {
         console.error("Error submitting form:", error);
     }
@@ -158,10 +136,8 @@ const fetchEvidence = async () => {
 
 
 // menu active and de-active system using by key
-
 const activeRequirement = ref(0)
 const activeDescription = ref(0)
-const activePciDss = ref(0)
 
 
 </script>
@@ -1175,16 +1151,19 @@ const activePciDss = ref(0)
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-info mt-4" type="submit">Submit Document</button>
+                    <button class="btn btn-info mt-4" :disabled="isLoading" type="submit">
+                        <ButtonLoader :isLoading="isLoading"/>
+                        Submit Document
+                    </button>
                 </form>
             </div>
         </div>
     </div>
     <div :class="[
         isOpen ? 'translate-x-0' : 'translate-x-full',
-        'fixed top-0 right-0 h-full w-[550px] bg-white shadow-lg z-50 transition-transform ease-in-out duration-300'
+        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
     ]">
-        <div class="p-4 flex justify-between items-center bg-gray-50">
+        <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
             <h2 class="text-2xl font-bold">Reference Panel</h2>
             <button @click="isOpen = false" class="btn btn-sm btn-danger">
                 ✕
@@ -1192,7 +1171,7 @@ const activePciDss = ref(0)
         </div>
         <div class="px-4 py-2">
             <TabGroup>
-                <TabList class="flex space-x-1 bg-gray-200 rounded-sm">
+                <TabList class="flex space-x-1 bg-gray-200 dark:bg-slate-800 rounded-sm">
                     <Tab v-for="(tab, index) in tabs" :key="index" class="w-full py-1.5 font-medium rounded-sm"
                         :class="{ 'btn btn-info shadow-none': selectedTab === tab }" @click="changeTab(tab)">
                         <span class="capitalize font-semibold">{{ tab }}</span>

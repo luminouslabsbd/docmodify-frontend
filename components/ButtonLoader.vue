@@ -1,5 +1,7 @@
 <script setup>
-    const {isLoading} = useProps({
+    import {defineProps} from "vue";
+
+    const {isLoading} = defineProps({
         isLoading:{
             type : Boolean,
             required : true,

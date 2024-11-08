@@ -44,7 +44,8 @@
                     'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
                 },
             });
-            window.location = data.value.downloadUrl
+
+            //window.location = data.value.downloadUrl
             isDownloading.value = null;
         } catch (error) {
             console.error("Docx Generate Error:", error);

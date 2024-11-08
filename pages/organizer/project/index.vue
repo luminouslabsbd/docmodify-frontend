@@ -6,6 +6,7 @@ import { useFetch } from '#app';
 import { formatDate } from '~/utils/helper';
 import { deleteConfirmation } from '~/utils/helper';
 import { useTokenStore } from '~/stores/useTokenStore';
+import ButtonLoader from '~/components/ButtonLoader.vue';
 
 useHead({title:'Project'})
 definePageMeta({
@@ -186,7 +187,7 @@ const getLastPage = computed(()=>{
                         </tr>
                     </thead>
                     <tbody v-if="status === 'success'">
-                        <tr v-for="(project, key) in projects?.data?.data">
+                        <tr v-for="(project, key) in projects?.data?.projects?.data">
                             <td>{{ key + 1 }}</td>
                             <td class="whitespace-nowrap">{{ project?.name }}</td>
                             <td class="whitespace-nowrap w-[40%]">{{ project?.description }}</td>
@@ -240,7 +241,10 @@ const getLastPage = computed(()=>{
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-info">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
+                        <button type="submit" :disabled="isLoading" class="btn btn-info">
+                            <ButtonLoader :isLoading="isLoading"/>
+                            {{ isEdit.edit ? 'Update' : 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </form>

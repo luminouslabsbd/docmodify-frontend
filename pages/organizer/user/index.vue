@@ -5,6 +5,7 @@ import { useFetch } from '#app';
 import { formatDate } from '~/utils/helper';
 import { deleteConfirmation } from '~/utils/helper';
 import { useTokenStore } from '~/stores/useTokenStore';
+import ButtonLoader from '~/components/ButtonLoader.vue';
 
 
 useHead({ title: 'User'});
@@ -14,6 +15,7 @@ definePageMeta({
 
 
 const config = useRuntimeConfig();
+const isLoading = ref(false);
 const isOpen = ref(false);
 const projects = ref([]);
 const errors = ref({});
@@ -31,8 +33,7 @@ const form = ref({
     name: '',
     email: '',
     phone:'',
-    password:'',
-    project:'',
+    password:'' | [],
 });
 
 const resetForm = () => {
@@ -41,7 +42,7 @@ const resetForm = () => {
         email: '',
         phone:'',
         password:'',
-        project:'',
+        projects:[],
     };
     errors.value = {};
     isEdit.value.edit = false;
@@ -95,8 +96,11 @@ const { data: userProjects,refresh:userProjectRefresh} = useAsyncData(
 const getUserById = async (id) => {
     const { data, error, status } = await useApiFetch(`/organizer/user/${id}`, {
         method: 'GET',
+        params:{
+            isEdit:true,
+        }
     });
-    console.log("🚀 ~ getUserById ~ data:", data)
+    console.log("🚀 ~ getUserById ~ data:", data.value)
 
     if (status.value === 'error') {
         toast.error("Something want wrong!");
@@ -106,8 +110,7 @@ const getUserById = async (id) => {
     if (status.value === 'success') {
         const userData = data.value?.data;
         form.value = userData;
-        // form.projects = userData.projects.map(project => project.id);
-        form.value.projects = userData.projects.map(project => project.id);
+        form.value.projects = userData?.projects?.map(project => project.id);
 
         isEdit.value.edit = true;
         isEdit.value.id = id;
@@ -117,6 +120,7 @@ const getUserById = async (id) => {
 
 const submitForm = async () => {
     errors.value = {};
+    isLoading.value = true;
     try {
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
@@ -126,22 +130,23 @@ const submitForm = async () => {
 
         const body = {
             ...form.value,
-            // projects:form.value.projects.map(project => project.id), //Assign For Multiple Project
-            projects:[form.value.projects] //Assign For Single Project
+            projects:[form.value.projects]
         }
 
         const { data, error, pending, status } = await useApiFetch(url, {
             method,
-            body: body
+            body: body,
         });
 
         if (status.value === 'error') {
+            isLoading.value = false
             errors.value = error.value?.data?.errors;
         }
         if (status.value === 'success') {
             await refresh();
             resetForm();
             isOpen.value = false;
+            isLoading.value = false;
             toast.success(data.value?.message)
         }
     } catch (error) {
@@ -169,8 +174,6 @@ const deleteUser = async (id) => {
         }
     }
 }
-
-
 
 const getLastPage = computed(()=>{
     let page = {
@@ -224,7 +227,7 @@ const getLastPage = computed(()=>{
                         </tr>
                     </thead>
                     <tbody v-if="status === 'success'">
-                        <tr v-for="(user, key) in users?.data?.data">
+                        <tr v-for="(user, key) in users?.data?.users?.data">
                             <td>{{ key + 1 }}</td>
                             <td class="whitespace-nowrap">{{ user?.name }}</td>
                             <td class="whitespace-nowrap">{{ user?.email }}</td>
@@ -295,36 +298,19 @@ const getLastPage = computed(()=>{
                         <p v-if="errors?.password" class="text-red-500">{{ errors?.password[0] }}</p>
                     </div>
 
-                    <!-- <div>
-                        <label for="phone">Select Project<small class="text-red-500">*</small></label>
-                        <Multiselect
-                            v-model="form.projects"
-                            :options="userProjects?.data"
-                            :multiple="true"
-                            placeholder="Select project"
-                            :track-by="'id'"
-                            :label="'name'"
-                        />
-                    </div> -->
-
-                    <div>
-                        <label for="phone" :value="project.id">Select Project<small class="text-red-500">*</small></label>
-                        <select name="" id="" class="form-input" v-model="form.project">
+                    <div v-if="!(isEdit.edit)">
+                        <label for="projects">Select Project<small class="text-red-500">*</small></label>
+                        <select name="projects" id="projects" class="form-input" v-model="form.projects">
                             <option value="" selected disabled >Select one project</option>
-                            <option value="" v-for="(project, key) in userProjects?.data">{{ project.name  }}</option>
+                            <option :value="project.id" v-for="(project, key) in userProjects?.data" :key="key"> {{ project.name  }} </option>
                         </select>
-                        <p v-if="errors?.phone" class="text-red-500">{{ errors?.phone[0] }}</p>
+                        <p v-if="errors?.projects" class="text-red-500">{{ errors?.projects[0] }}</p>
                     </div>
-
-                    <!-- <div>
-                        <label class="flex gap-6 items-center" v-for="(project, key) in userProjects?.data" :for="`project-${key}`">
-                            <input type="radio" :id="`project-${key}`" :name="`project-name${key}`" v-model="form.projects" :value="project.id">
-                            <span>{{ project.name }}</span>
-                        </label>
-                    </div> -->
-
                     <div>
-                        <button type="submit" class="btn btn-info">{{ isEdit.edit ? 'Update' : 'Submit' }}</button>
+                        <button type="submit" :disabled="isLoading" class="btn btn-info">
+                            <ButtonLoader :isLoading="isLoading" />
+                            {{ isEdit.edit ? 'Update' : 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </form>

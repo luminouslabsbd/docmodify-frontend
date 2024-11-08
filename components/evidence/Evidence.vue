@@ -3,6 +3,7 @@
     import { tabs } from '~/utils/helper';
     import { useFetch } from '#app';
     import { toast } from "vue3-toastify";
+import ButtonLoader from '../ButtonLoader.vue';
 
     const {tab, evidences, fetchEvidence} = defineProps({
         tab: {
@@ -33,7 +34,7 @@
         }
     });
 
-    const config = useRuntimeConfig();
+    const isLoading = ref(false);
     const evidence = ref({})
     const errors = ref({});
     const isOpen = ref(false)
@@ -63,6 +64,7 @@
         }
     }
     const submitForm = async() =>{
+        isLoading.value = true;
         const formData = new FormData();
         formData.append('number',form.value.number);
         formData.append('title',form.value.title);
@@ -76,16 +78,19 @@
             });
 
             if (status.value === 'error') {
+                isLoading.value = false;
                 errors.value = error.value?.data?.errors;
             }
             if (status.value === 'success') {
                 await fetchEvidence();
                 resetForm();
                 isOpen.value = false;
+                isLoading.value = false;
                 toast.success(data.value?.message)
             }
         } catch (error) {
             toast.error('Something want wrong!')
+            isLoading.value = false;
             console.log("🚀 ~ submitForm ~ error:", error)
         }
     }
@@ -131,10 +136,29 @@
         }
     }
 
+    function getExtensionColor(extension) {
+        switch (extension) {
+            case 'pdf':
+                return 'bg-green-500';
+            case 'docx':
+                return 'bg-blue-500';
+            case 'jpg':
+                return 'bg-violet-500'
+            case 'jpeg':
+                return 'bg-orange-500'
+            case 'png':
+                return 'bg-yellow-500';
+            case 'mp4':
+                return 'bg-rose-500';
+            default:
+                return 'bg-gray-500';
+    }
+}
+
 
 </script>
 <template>
-    <div class="bg-gray-100 mt-5 px-4 py-2">
+    <div class="bg-gray-100 dark:bg-slate-800 mt-5 px-4 py-2">
         <div class="flex justify-between">
             <h4 class="font-semibold text-lg" >{{ title }}</h4>
             <button class="btn btn-info btn-sm" @click="isOpen = true">
@@ -161,7 +185,11 @@
                     <td>{{ key + 1}}</td>
                     <td>{{ evidence?.number }}</td>
                     <td>{{ evidence?.title }}</td>
-                    <td>Docx,Pdf,jpeg</td>
+                    <td>
+                        <span class="px-[10px] py-[1px] rounded-sm text-white font-semibold text-sm"
+                              :class="getExtensionColor(evidence?.extension)"
+                            >{{ evidence?.extension }}</span>
+                    </td>
                     <td class="text-right">
                         <div class="flex gap-1">
                             <button @click="showEvidence(evidence?.id)" class="btn btn-info btn-sm">
@@ -217,7 +245,10 @@
                     </div>
 
                     <div>
-                        <button type="submit" class="btn btn-info">{{ 'Submit' }}</button>
+                        <button type="submit" class="btn btn-info" :disabled="isLoading" >
+                            <ButtonLoader :isLoading="isLoading"/>
+                            {{ 'Submit' }}
+                        </button>
                     </div>
                 </div>
             </form>
