@@ -173,7 +173,7 @@
                                     <svg>...</svg>
                                 </button>
                                 <div class="bg-[#fbfbfb] py-3 text-lg font-bold ltr:pl-5 ltr:pr-[50px] rtl:pl-[50px] rtl:pr-5 dark:bg-[#121c2c]">
-                                    Modal Title
+                                    Generate Docx & Download
                                 </div>
                                 <div class="p-5">
                                     <div v-if="generateDownload" class="mt-10 flex flex-col items-center justify-center gap-3">
