@@ -114,7 +114,7 @@
     <div class="panel">
 
         <div class="mb-5 flex items-center justify-between">
-            <h5 class="text-lg font-semibold dark:text-white-light">All User - <small>{{ users?.data?.total }}</small></h5>
+            <h5 class="text-lg font-semibold dark:text-white-light">User Projects</h5>
             <div class="flex gap-3">
                 <button @click="getProjectForAssign()" type="button" class="btn btn-info btn-sm space-x-1">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-5">
