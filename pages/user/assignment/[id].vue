@@ -209,7 +209,7 @@
                         <div v-if="JSON.parse(data?.description?.form)?.assignment">
                             <h3 class="text-xl font-bold">{{ data?.description?.title }}</h3>
                             <div class="">
-                                <h4 class="my-3 text-lg font-semibold text-red-600">{{ data?.title }}</h4>
+                                <h4 class="my-3 text-lg font-semibold">{{ data?.title }}</h4>
                                 <div v-if="JSON.parse(data?.form)?.subTitle" v-html="JSON.parse(data?.form)?.subTitle" />
 
                                 <!-- 1.8 Requirement Table -->
