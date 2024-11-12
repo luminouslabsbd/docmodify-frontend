@@ -688,3 +688,20 @@
 .menu-scroll{
     @apply  [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-thumb]:rounded-full  [&::-webkit-scrollbar-thumb]:bg-info dark:[&::-webkit-scrollbar-track]:bg-info dark:[&::-webkit-scrollbar-thumb]:bg-info;
 }
+
+@layer components {
+    /* Apply styles for li, a, p, td, and th */
+    li, a, p, td, th ,label {
+        @apply text-base font-semibold;
+    }
+
+    /* Apply styles for text input */
+    input[type="text"],input[type="password"],input[type="date"],input[type="email"] {
+        @apply text-base font-semibold;
+    }
+
+    /* Apply styles for textarea */
+    textarea {
+        @apply text-base font-semibold; /* Make sure to add padding and border here */
+    }
+}

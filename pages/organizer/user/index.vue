@@ -202,12 +202,12 @@ const getLastPage = computed(()=>{
             <h5 class="text-lg font-semibold dark:text-white-light">All User - <small>{{ users?.data?.total }}</small></h5>
             <div class="flex gap-3">
                 <input type="search" v-model="query" placeholder="Search..." class="form-input">
-                <button @click="createUser()" type="button" class="btn btn-info btn-sm space-x-1">
+                <button @click="createUser()" type="button" class="btn btn-info btn-sm whitespace-nowrap">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                     <span>
-                        Create
+                        User Create
                     </span>
                 </button>
             </div>
@@ -264,7 +264,7 @@ const getLastPage = computed(()=>{
         'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
     ]">
         <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
-            <h2 class="text-2xl font-semibold">{{ isEdit.edit ? 'Edit & Update' : 'Create' }} User</h2>
+            <h2 class="text-2xl font-semibold">User {{ isEdit.edit ? 'Edit & Update' : 'Create' }} </h2>
             <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
         </div>
         <div class="p-4">

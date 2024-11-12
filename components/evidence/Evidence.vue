@@ -3,7 +3,7 @@
     import { tabs } from '~/utils/helper';
     import { useFetch } from '#app';
     import { toast } from "vue3-toastify";
-import ButtonLoader from '../ButtonLoader.vue';
+    import ButtonLoader from '../ButtonLoader.vue';
 
     const {tab, evidences, fetchEvidence} = defineProps({
         tab: {
@@ -21,14 +21,42 @@ import ButtonLoader from '../ButtonLoader.vue';
         }
     })
 
+    const evidenceTitle = ref({
+        number:'Reference Number',
+        name:{
+            title:'',
+            subTitle:''
+        },
+        purpose:'',
+        revisionDate:{
+            title:'',
+            subTitle:'',
+        }
+    })
+
     const title = computed(() => {
         switch (tab) {
             case tabs.DOCUMENT:
-            return "Documentation Evidence";
+                evidenceTitle.value.name.title = "Document Name";
+                evidenceTitle.value.name.subTitle = "(including version, if applicable)";
+                evidenceTitle.value.purpose = "Document Purpose";
+                evidenceTitle.value.revisionDate.title = "Document Revision Date";
+                evidenceTitle.value.revisionDate.subTitle = "(if applicable)";
+                return "Documentation Evidence";
+
             case tabs.INTERVIEW:
-            return "Interview Evidence";
+            evidenceTitle.value.name.title = "Title of Workpaper with Interview Notes";
+                evidenceTitle.value.purpose = "Topics Covered";
+                evidenceTitle.value.revisionDate.title = "Role(s) of Interviewee(s)";
+                return "Interview Evidence";
+
             case tabs.ASSESSMENT:
-            return "Assessment Evidence";
+                evidenceTitle.value.name.title = "Title of Workpaper or Evidence";
+                evidenceTitle.value.purpose = "Topics Covered or Evidence Collected";
+                evidenceTitle.value.revisionDate.title = "Sample Set Reference Number from Table 6.3";
+                evidenceTitle.value.revisionDate.subTitle = "(if applicable)";
+                return "Assessment Evidence";
+
             default:
             return "Unknown Evidence";
         }
@@ -41,7 +69,9 @@ import ButtonLoader from '../ButtonLoader.vue';
     const isShow = ref(false)
     const form = ref({
         number: '',
-        title:'',
+        name:'',
+        purpose:'',
+        revision_date:'',
         file:null,
         type:tab
     });
@@ -49,13 +79,14 @@ import ButtonLoader from '../ButtonLoader.vue';
     const resetForm = () => {
         form.value = {
             number: '',
-            title:'',
+            name:'',
+            purpose:'',
+            revision_date:'',
             file:null,
             type:tab
         };
         errors.value = {};
     };
-
 
     const uploadFile = (event) => {
         const target = event.target;
@@ -67,7 +98,9 @@ import ButtonLoader from '../ButtonLoader.vue';
         isLoading.value = true;
         const formData = new FormData();
         formData.append('number',form.value.number);
-        formData.append('title',form.value.title);
+        formData.append('name',form.value.name);
+        formData.append('purpose',form.value.purpose);
+        formData.append('revision_date',form.value.revision_date);
         formData.append('file',form.value.file);
         formData.append('type',form.value.type);
         errors.value = {};
@@ -173,18 +206,20 @@ import ButtonLoader from '../ButtonLoader.vue';
         <table>
             <thead>
                 <tr>
-                    <th>#Sl</th>
-                    <th>Number</th>
-                    <th>Title</th>
-                    <th>File Type</th>
-                    <th class="text-right">Action</th>
+                    <th class="whitespace-nowrap">Reference Number</th>
+                    <th class="whitespace-nowrap">{{ evidenceTitle.name?.title }}</th>
+                    <th class="whitespace-nowrap">{{ evidenceTitle?.purpose}}</th>
+                    <th class="whitespace-nowrap">{{ evidenceTitle?.revisionDate?.title}}</th>
+                    <th class="whitespace-nowrap">File Type</th>
+                    <th class="whitespace-nowrap text-right">Action</th>
                 </tr>
             </thead>
             <tbody v-if="evidences?.data?.length">
                 <tr v-for="(evidence,key) in evidences?.data">
-                    <td>{{ key + 1}}</td>
                     <td>{{ evidence?.number }}</td>
-                    <td>{{ evidence?.title }}</td>
+                    <td>{{ evidence?.name }}</td>
+                    <td>{{ evidence?.purpose }}</td>
+                    <td>{{ evidence?.revision_date }}</td>
                     <td>
                         <span class="px-[10px] py-[1px] rounded-sm text-white font-semibold text-sm"
                               :class="getExtensionColor(evidence?.extension)"
@@ -215,7 +250,7 @@ import ButtonLoader from '../ButtonLoader.vue';
     </div>
     <div :class="[
         isOpen ? 'translate-x-0' : 'translate-x-full',
-        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
+        'fixed right-0 top-0 z-50 h-full w-[950px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
     ]">
         <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
             <h2 class="text-2xl font-semibold">Create {{ title }}</h2>
@@ -232,11 +267,26 @@ import ButtonLoader from '../ButtonLoader.vue';
                     </div>
 
                     <div>
-                        <label for="title">Reference Title <small class="text-red-500">*</small></label>
-                        <input v-model="form.title" id="title" type="text" placeholder="Enter reference title"
+                        <label for="name">{{ evidenceTitle.name?.title }} <small class="text-red-500">*</small></label>
+                        <input v-model="form.name" id="name" type="text" :placeholder="`${evidenceTitle.name?.title} ${evidenceTitle.name?.subTitle}`"
                             class="form-input" />
-                        <p v-if="errors?.title" class="text-red-500">{{ errors?.title[0] }}</p>
+                        <p v-if="errors?.name" class="text-red-500">{{ errors?.name[0] }}</p>
                     </div>
+
+                    <div>
+                        <label for="purpose">{{ evidenceTitle.purpose }} <small class="text-red-500">*</small></label>
+                        <input v-model="form.purpose" id="purpose" type="text" :placeholder="evidenceTitle.purpose"
+                            class="form-input" />
+                        <p v-if="errors?.purpose" class="text-red-500">{{ errors?.purpose[0] }}</p>
+                    </div>
+
+                    <div>
+                        <label for="revision_date">{{ evidenceTitle.revisionDate?.title}} <small class="text-red-500">*</small></label>
+                        <input v-model="form.revision_date" id="revision_date" :type="tab === tabs.DOCUMENT ? 'date' : 'text'" :placeholder="`${evidenceTitle.revisionDate?.title} ${evidenceTitle.revisionDate?.subTitle}`"
+                            class="form-input" />
+                        <p v-if="errors?.revision_date" class="text-red-500">{{ errors?.revision_date[0] }}</p>
+                    </div>
+
 
                     <div>
                         <label for="file">Reference File <code>Docx,PDF,Text etc...</code> <small class="text-red-500">*</small></label>

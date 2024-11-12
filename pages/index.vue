@@ -51,9 +51,6 @@ const onSubmit = async () => {
         const userData = await fetchUser();
         setAuthUser(userData?.data?.value)
         if (userData?.data?.value) {
-            // toast.success('Login Successfully....')
-            // console.log(userData.data.value.type)
-
             let defaultNavigate = "/admin/dashboard"
             if(userData.data.value.type === authType.ADMIN){
                 defaultNavigate = "/admin/dashboard";
@@ -109,7 +106,15 @@ const onSubmit = async () => {
                     </div>
                 </div>
                 <div
+
                     class="relative flex w-full flex-col items-center justify-center gap-6 px-4 pb-16 pt-6 sm:px-6 lg:max-w-[667px]">
+
+                    <div v-if="errors?.errors?.expire" class="flex gap-2 items-center text-2xl font-bold text-white bg-red-500 px-4 py-3 rounded-lg shadow-lg">
+                        <IconDanger/>
+                        <p class="">{{ errors?.errors?.expire[0] }}</p>
+                    </div>
+
+
                     <div
                         class="flex w-full max-w-[440px] items-center gap-2 lg:absolute lg:end-6 lg:top-6 lg:max-w-full">
                         <NuxtLink to="/" class="block w-8 lg:hidden">

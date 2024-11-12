@@ -1,11 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { toast } from "vue3-toastify";
 import { useAsyncData } from '#app';
-import { useFetch } from '#app';
 import { useApiFetch } from '~/composables/useApiFetch';
 import { useTokenStore } from '~/stores/useTokenStore';
 import ButtonLoader from '~/components/ButtonLoader.vue';
+import { formatDate } from '~/utils/helper';
 
 useHead({ title: 'Organizer' })
 definePageMeta({
@@ -28,7 +28,8 @@ const form = ref({
     phone: '',
     password: '',
     organization: '',
-    address: ''
+    address: '',
+    expiry:'',
 });
 
 const resetForm = () => {
@@ -38,7 +39,8 @@ const resetForm = () => {
         phone: '',
         password: '',
         organization: '',
-        address: ''
+        address: '',
+        expiry:'',
     };
     errors.value = {};
     isEdit.value.edit = false;
@@ -109,7 +111,9 @@ const submitForm = async () => {
         });
 
         if (status.value === 'error') {
+            isLoading.value = false;
             errors.value = error.value?.data?.errors;
+
         }
         if (status.value === 'success') {
             await refresh();
@@ -119,6 +123,7 @@ const submitForm = async () => {
             toast.success(data.value?.message)
         }
     } catch (error) {
+        isLoading.value = false;
         toast.error('Something want wrong!')
         console.log("🚀 ~ submitForm ~ error:", error)
     }
@@ -171,13 +176,11 @@ const getLastPage = computed(()=>{
             <h5 class="text-lg font-semibold dark:text-white-light">All Organizer - {{ organizers?.data?.total }}</h5>
             <div class="flex gap-3">
                 <input type="search" v-model="query" placeholder="Search..." class="form-input">
-                <button @click="createOrganizer()" type="button" class="btn btn-info btn-sm space-x-1">
+                <button @click="createOrganizer()" type="button" class="btn btn-info btn-sm whitespace-nowrap">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-                    <span>
-                        Create
-                    </span>
+                    Organizer Create
                 </button>
             </div>
         </div>
@@ -190,6 +193,12 @@ const getLastPage = computed(()=>{
                             <th>Name</th>
                             <th>Phone Number</th>
                             <th>Email Address</th>
+                            <th>
+                                <div class="flex flex-col">
+                                    <span>Expiry date</span>
+                                    <span>(y-m-d)</span>
+                                </div>
+                            </th>
                             <th>Address</th>
                             <th class="text-center">Action</th>
                         </tr>
@@ -200,6 +209,7 @@ const getLastPage = computed(()=>{
                             <td class="whitespace-nowrap">{{ organizer?.name }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.phone }}</td>
                             <td class="whitespace-nowrap">{{ organizer?.email }}</td>
+                            <td class="whitespace-nowrap">{{ new Date(organizer?.expiry).toLocaleDateString()}}</td>
                             <td class="w-[25%]">{{ organizer?.organization?.address }}</td>
                             <td>
                                 <div class="flex gap-2">
@@ -230,7 +240,7 @@ const getLastPage = computed(()=>{
         'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
     ]">
         <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
-            <h2 class="text-2xl font-semibold">{{ isEdit.edit ? "Edit" : "Create" }} Organizer</h2>
+            <h2 class="text-2xl font-semibold">Organizer {{ isEdit.edit ? "Edit" : "Create" }}</h2>
             <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
         </div>
         <div class="p-4">
@@ -276,6 +286,14 @@ const getLastPage = computed(()=>{
                         <textarea v-model="form.address" id="address" rows="4" class="form-input"
                             placeholder="Enter address"></textarea>
                         <p v-if="errors?.address" class="text-red-500">{{ errors?.address[0] }}</p>
+                    </div>
+
+                    <div>
+                        <label for="address">Expiry date <small class="text-red-500">*</small></label>
+                        <input type="date" v-model="form.expiry" class="form-input"
+                            placeholder="Enter expiry date"
+                        >
+                        <p v-if="errors?.expiry" class="text-red-500">{{ errors?.expiry[0] }}</p>
                     </div>
 
                     <div>

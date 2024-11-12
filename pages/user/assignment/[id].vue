@@ -31,6 +31,7 @@
     const isOpen = ref(false);
     const evidences = ref([]);
     const requirementId = ref(1);
+    const formEvidences = ref([]);
     const { data: menus, refresh: menuRefresh } = useAsyncData(
         'user_menus',
         () =>
@@ -82,6 +83,10 @@
                     console.error('Failed to parse `values` in data:', error);
                     inputValues.value = {};
                 }
+            }
+
+            if(newData?.evidence){
+                formEvidences.value = newData?.evidence;
             }
         },
         { immediate: true }
@@ -1405,14 +1410,14 @@
                                         <thead>
                                             <tr>
                                                 <th
-                                                    class="border border-slate-900"
+                                                    class="border border-slate-900 text-xl font-bold"
                                                     colspan="4"
                                                     style="background-color: teal; color: white; text-align: center"
                                                 >
                                                     Assessment Findings (select one)
                                                 </th>
                                                 <th
-                                                    class="border border-slate-900"
+                                                    class="border border-slate-900 text-xl font-bold"
                                                     colspan="4"
                                                     style="background-color: #b57faf; color: white; text-align: center"
                                                 >
@@ -1422,12 +1427,12 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td class="border border-slate-900 bg-gray-100 text-center">In Place</td>
-                                                <td class="border border-slate-900 bg-gray-100 text-center">Not Applicable</td>
-                                                <td class="border border-slate-900 bg-gray-100 text-center">Not Tested</td>
-                                                <td class="border border-slate-900 bg-gray-100 text-center">Not in Place</td>
-                                                <td class="border border-slate-900 bg-pink-100 text-center">Compensating Control*</td>
-                                                <td class="border border-slate-900 bg-pink-100 text-center">Customized Approach*</td>
+                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">In Place</td>
+                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not Applicable</td>
+                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not Tested</td>
+                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not in Place</td>
+                                                <td class="border border-slate-900 bg-pink-100 text-center text-md font-bold whitespace-nowrap">Compensating Control*</td>
+                                                <td class="border border-slate-900 bg-pink-100 text-center text-md font-bold whitespace-nowrap">Customized Approach*</td>
                                             </tr>
                                             <tr>
                                                 <td
@@ -1452,12 +1457,17 @@
                                                     <div class="text-dark" v-html="JSON.parse(data?.form)?.note?.title"></div>
                                                 </td>
                                                 <td class="border border-slate-900 p-3" colspan="3">
-                                                    <input
+                                                    <textarea
+                                                        rows="10"
+                                                        class="form-input text-lg"
+                                                        :name="JSON.parse(data?.form)?.note?.name"
+                                                    >{{ inputValues[JSON.parse(data?.form)?.note?.name] ?? defaultValues.placeholder }}</textarea>
+                                                    <!-- <input
                                                         type="text"
                                                         class="form-input"
                                                         :value="inputValues[JSON.parse(data?.form)?.note?.name] ?? defaultValues.placeholder"
                                                         :name="JSON.parse(data?.form)?.note?.name"
-                                                    />
+                                                    /> -->
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -1466,19 +1476,19 @@
                                         <thead>
                                             <tr>
                                                 <th
-                                                    class="border border-t-0 border-slate-900 text-white"
+                                                    class="border border-t-0 border-slate-900 text-white text-lg font-bold"
                                                     style="width: 25%; background-color: teal; text-align: center"
                                                 >
                                                     Testing Procedures
                                                 </th>
                                                 <th
-                                                    class="border border-t-0 border-slate-900 text-white"
+                                                    class="border border-t-0 border-slate-900 text-white text-lg font-bold"
                                                     style="width: 25%; background-color: teal; text-align: center"
                                                 >
                                                     Reporting Instructions
                                                 </th>
                                                 <th
-                                                    class="border border-t-0 border-slate-900 text-white"
+                                                    class="border border-t-0 border-slate-900 text-white text-lg font-bold"
                                                     style="width: 50%; background-color: teal; text-align: center"
                                                 >
                                                     Reporting Details: Assessor’s Response
@@ -1510,9 +1520,9 @@
                             </div>
                         </div>
                     </div>
-                    <button class="btn btn-info mt-4" :disabled="isLoading" type="submit">
+                    <button class="btn btn-info btn-lg mt-4" :disabled="isLoading" type="submit">
                         <ButtonLoader :isLoading="isLoading" />
-                        Submit Document
+                        Save
                     </button>
                 </form>
             </div>
@@ -1521,7 +1531,7 @@
     <div
         :class="[
             isOpen ? 'translate-x-0' : 'translate-x-full',
-            'fixed right-0 top-0 z-50 h-full w-[550px] bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-black',
+            'fixed right-0 top-0 z-50 h-full w-[950px] bg-white shadow-lg transition-transform duration-300 ease-in-out dark:bg-black',
         ]"
     >
         <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 p-4 dark:border-gray-800 dark:bg-black">
