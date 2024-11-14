@@ -68,10 +68,22 @@
     const isOpen = ref(false)
     const isShow = ref(false)
     const form = ref({
-        number: '',
-        name:'',
-        purpose:'',
-        revision_date:'',
+        number: {
+            key:'referenceNumber_6_4_',
+            value:''
+        },
+        name:{
+            key:'documentName_6_4_',
+            value:''
+        },
+        purpose:{
+            key:'purpose_6_4_',
+            value:''
+        },
+        revision_date:{
+            key:'documentRevisionDate_6_4_',
+            value:''
+        },
         file:null,
         type:tab
     });
@@ -97,10 +109,17 @@
     const submitForm = async() =>{
         isLoading.value = true;
         const formData = new FormData();
-        formData.append('number',form.value.number);
-        formData.append('name',form.value.name);
-        formData.append('purpose',form.value.purpose);
-        formData.append('revision_date',form.value.revision_date);
+        formData.append('number',form.value.number.key);
+        formData.append('name',form.value.name.key);
+        formData.append('purpose',form.value.purpose.key);
+        formData.append('revisionDate',form.value.revision_date.key);
+
+        formData.append('numberValue',form.value.number.value);
+        formData.append('nameValue',form.value.name.value);
+        formData.append('purposeValue',form.value.purpose.value);
+        formData.append('revisionDateValue',form.value.revision_date.value);
+
+
         formData.append('file',form.value.file);
         formData.append('type',form.value.type);
         errors.value = {};
@@ -261,28 +280,28 @@
                 <div class="space-y-5">
                     <div>
                         <label for="number">Reference Number <small class="text-red-500">*</small></label>
-                        <input v-model="form.number" id="number" type="text" placeholder="Enter reference number"
+                        <input v-model="form.number.value" id="number" type="text" placeholder="Enter reference number"
                             class="form-input" />
                         <p v-if="errors?.number" class="text-red-500">{{ errors?.number[0] }}</p>
                     </div>
 
                     <div>
                         <label for="name">{{ evidenceTitle.name?.title }} <small class="text-red-500">*</small></label>
-                        <input v-model="form.name" id="name" type="text" :placeholder="`${evidenceTitle.name?.title} ${evidenceTitle.name?.subTitle}`"
+                        <input v-model="form.name.value" id="name" type="text" :placeholder="`${evidenceTitle.name?.title} ${evidenceTitle.name?.subTitle}`"
                             class="form-input" />
                         <p v-if="errors?.name" class="text-red-500">{{ errors?.name[0] }}</p>
                     </div>
 
                     <div>
                         <label for="purpose">{{ evidenceTitle.purpose }} <small class="text-red-500">*</small></label>
-                        <input v-model="form.purpose" id="purpose" type="text" :placeholder="evidenceTitle.purpose"
+                        <input v-model="form.purpose.value" id="purpose" type="text" :placeholder="evidenceTitle.purpose"
                             class="form-input" />
                         <p v-if="errors?.purpose" class="text-red-500">{{ errors?.purpose[0] }}</p>
                     </div>
 
                     <div>
                         <label for="revision_date">{{ evidenceTitle.revisionDate?.title}} <small class="text-red-500">*</small></label>
-                        <input v-model="form.revision_date" id="revision_date" :type="tab === tabs.DOCUMENT ? 'date' : 'text'" :placeholder="`${evidenceTitle.revisionDate?.title} ${evidenceTitle.revisionDate?.subTitle}`"
+                        <input v-model="form.revision_date.value" id="revision_date" :type="tab === tabs.DOCUMENT ? 'date' : 'text'" :placeholder="`${evidenceTitle.revisionDate?.title} ${evidenceTitle.revisionDate?.subTitle}`"
                             class="form-input" />
                         <p v-if="errors?.revision_date" class="text-red-500">{{ errors?.revision_date[0] }}</p>
                     </div>

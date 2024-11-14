@@ -192,7 +192,7 @@
                                             class="mb-2 cursor-pointer rounded-sm bg-gray-100 px-2 py-1 hover:bg-info hover:text-white dark:bg-slate-700"
                                             :class="{ 'bg-info text-white': pciDss.id === data.id }"
                                         >
-                                            {{ pciDss?.key }}
+                                           {{ pciDss?.key }}
                                         </h3>
                                     </li>
                                 </ul>
@@ -222,27 +222,27 @@
                                     <table class="table border border-slate-900">
                                         <thead>
                                             <tr>
-                                                <th rowspan="2" class="align-middle" style="background: teal; color: white">PCI DSS Requirement</th>
-                                                <th colspan="4" class="align-middle" style="background: teal; color: white">
+                                                <th rowspan="2" class="align-middle" style="border:1px solid; background: teal; color: white">PCI DSS Requirement</th>
+                                                <th colspan="4" class="align-middle" style="border:1px solid; background: teal; color: white">
                                                     Assessment Finding Select all options that apply.
                                                 </th>
-                                                <th colspan="2" class="align-middle" style="background: #b57faf; color: white">
+                                                <th colspan="2" class="align-middle" style="border:1px solid; background: #b57faf; color: white">
                                                     Select If Below Method(s) Was Used
                                                 </th>
                                             </tr>
                                             <tr>
-                                                <th class="" style="background-color: #cbd4d5; color: black">In Place</th>
-                                                <th class="" style="background-color: #cbd4d5; color: black">Not Applicable</th>
-                                                <th class="" style="background-color: #cbd4d5; color: black">Not Tested</th>
-                                                <th class="" style="background-color: #cbd4d5; color: black">Not in Place</th>
-                                                <th class="" style="background-color: #ebd6e4; color: black">Compensating Control</th>
-                                                <th class="" style="background-color: #ebd6e4; color: black">Customized Approach</th>
+                                                <th class="" style="border:1px solid; background-color: #cbd4d5; color: black">In Place</th>
+                                                <th class="" style="border:1px solid; background-color: #cbd4d5; color: black">Not Applicable</th>
+                                                <th class="" style="border:1px solid; background-color: #cbd4d5; color: black">Not Tested</th>
+                                                <th class="" style="border:1px solid; background-color: #cbd4d5; color: black">Not in Place</th>
+                                                <th class="" style="border:1px solid; background-color: #ebd6e4; color: black">Compensating Control</th>
+                                                <th class="" style="border:1px solid; background-color: #ebd6e4; color: black">Customized Approach</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr style="border: 1px solid; padding: 3px 5px" v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                <td style="border: 1px solid" class="text-dark">{{ row?.title }}</td>
-                                                <td style="border: 1px solid" class="text-dark" v-for="(td, key) in row?.inputs">
+                                                <td style="border: 1px solid;text-align: center;" class="text-dark">{{ row?.title }}</td>
+                                                <td style="border: 1px solid;text-align:center;" class="text-dark" v-for="(td, key) in row?.inputs">
                                                     <input type="hidden" :name="td?.name" :value="defaultValues.notChecked" />
                                                     <input
                                                         type="checkbox"
@@ -265,15 +265,15 @@
                                     <table class="table border border-slate-900">
                                         <thead>
                                             <tr style="border: 1px solid; padding: 3px 5px">
-                                                <th style="border: 1px solid" class="text-dark">Not Applicable</th>
-                                                <th style="border: 1px solid" class="text-dark">Not Tested</th>
-                                                <th style="border: 1px solid" class="text-dark">Not in Place Due to a Legal Restriction</th>
-                                                <th style="border: 1px solid" class="text-dark">Not in Place Not Due to a Legal Restriction</th>
-                                                <th style="border: 1px solid" class="text-dark">Compensating Control</th>
-                                                <th style="border: 1px solid" class="text-dark">Customized Approach</th>
+                                                <th style="border: 1px solid;text-align: center;" class="text-dark">Not Applicable</th>
+                                                <th style="border: 1px solid;text-align: center;" class="text-dark">Not Tested</th>
+                                                <th style="border: 1px solid;text-align: center;" class="text-dark">Not in Place Due to a Legal Restriction</th>
+                                                <th style="border: 1px solid;text-align: center;" class="text-dark">Not in Place Not Due to a Legal Restriction</th>
+                                                <th style="border: 1px solid;text-align: center;" class="text-dark">Compensating Control</th>
+                                                <th style="border: 1px solid;text-align: center;" class="text-dark">Customized Approach</th>
                                             </tr>
                                             <tr style="border: 1px solid">
-                                                <td style="border: 1px solid; padding: 23px 56px" class="text-dark">
+                                                <td style="border: 1px solid; text-align: center; padding: 23px 56px" class="text-dark">
                                                     <input
                                                         type="hidden"
                                                         :name="'sub_requirements_interviews_1_1_1_not_applicable'"
@@ -290,7 +290,7 @@
                                                         :value="defaultValues.checked"
                                                     />
                                                 </td>
-                                                <td style="border: 1px solid; padding: 23px 56px" class="text-dark">
+                                                <td style="border: 1px solid; text-align: center; padding: 23px 56px" class="text-dark">
                                                     <input
                                                         type="hidden"
                                                         :name="'sub_requirements_interviews_1_1_1_not_tested'"
@@ -307,7 +307,7 @@
                                                         :value="defaultValues.checked"
                                                     />
                                                 </td>
-                                                <td style="border: 1px solid; padding: 23px 56px" class="text-dark">
+                                                <td style="border: 1px solid; text-align: center; padding: 23px 56px" class="text-dark">
                                                     <input
                                                         type="hidden"
                                                         :name="'sub_requirements_interviews_1_1_1_not_in_place_due_to_legal'"
@@ -324,7 +324,7 @@
                                                         :value="defaultValues.checked"
                                                     />
                                                 </td>
-                                                <td style="border: 1px solid; padding: 23px 56px" class="text-dark">
+                                                <td style="border: 1px solid; text-align: center; padding: 23px 56px" class="text-dark">
                                                     <input
                                                         type="hidden"
                                                         :name="'sub_requirements_interviews_1_1_1_not_in_place_not_due_to_legal'"
@@ -341,7 +341,7 @@
                                                         :value="defaultValues.checked"
                                                     />
                                                 </td>
-                                                <td style="border: 1px solid; padding: 23px 56px" class="text-dark">
+                                                <td style="border: 1px solid; text-align: center; padding: 23px 56px" class="text-dark">
                                                     <input
                                                         type="hidden"
                                                         :name="'sub_requirements_interviews_1_1_1_compensating_control'"
@@ -358,7 +358,7 @@
                                                         :value="defaultValues.checked"
                                                     />
                                                 </td>
-                                                <td style="border: 1px solid; padding: 23px 56px" class="text-dark">
+                                                <td style="border: 1px solid; text-align: center; padding: 23px 56px" class="text-dark">
                                                     <input
                                                         type="hidden"
                                                         :name="'sub_requirements_interviews_1_1_1_customized_approach'"
@@ -386,13 +386,30 @@
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_3_3'">
                                         <table class="mt-5 table">
                                             <tr>
-                                                 <td class="border border-slate-900 p-3">
+                                                 <td class="border border-slate-900 p-3 w-[50%]">
                                                     Indicate whether the assessed entity uses one or more PCI SSC validated products or solutions.
                                                  </td>
                                                  <td class="border border-slate-900 p-3">
-                                                    <input type="text" class="form-input"
-                                                    :value="inputValues['indicate_whether_assessed_solutions_3_3'] ?? defaultValues.placeholder"
-                                                    :name="'indicate_whether_assessed_solutions_3_3'" />
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`indicate_whether_assessed_solutions_3_3_yes`"
+                                                                    :inputValue="inputValues[`indicate_whether_assessed_solutions_3_3_yes`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`indicate_whether_assessed_solutions_3_3_no`"
+                                                                    :inputValue="inputValues[`indicate_whether_assessed_solutions_3_3_no`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">No</span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </td>
                                             </tr>
                                             <tr>
@@ -412,19 +429,25 @@
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody_3_2">
                                                 <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
                                         <table class="mt-5 table">
                                             <tr>
-                                                 <td class="border border-slate-900 p-3">
+                                                 <td class="border border-slate-900 p-3 w-[50%]">
                                                     Provide the name of the assessor who attests that they have read the instruction manual associated with each of the software/solution(s) listed above and confirmed that the merchant has implemented the solution per the instructions and detail in the instruction manual.
                                                  </td>
                                                  <td class="border border-slate-900 p-3">
-                                                    <input type="text" class="form-input"
-                                                    :value="inputValues['assessorWhoAttestsInstruction_3_3'] ?? defaultValues.placeholder"
-                                                    :name="'assessorWhoAttestsInstruction_3_3'" />
+                                                    <PcidssTextarea
+                                                        :name="`assessorWhoAttestsInstruction_3_3`"
+                                                        :inputValue = "inputValues[`assessorWhoAttestsInstruction_3_3`]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                             <tr>
@@ -432,16 +455,30 @@
                                                     Any additional comments or findings the assessor would like to include, if applicable.
                                                  </td>
                                                  <td class="border border-slate-900 p-3">
-                                                    <input type="text" class="form-input"
-                                                    :value="inputValues['anyAdditionalCommentsOrFindings_3_3'] ?? defaultValues.placeholder"
-                                                    :name="'anyAdditionalCommentsOrFindings_3_3'" />
+                                                    <PcidssTextarea
+                                                        :name="`anyAdditionalCommentsOrFindings_3_3`"
+                                                        :inputValue = "inputValues[`anyAdditionalCommentsOrFindings_3_3`]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
                                     </div>
+                                    <!-- 4.1 Requirement Table -->
+                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_1'">
+                                        <div class="p-2 my-3 border-4 border-dashed border-gray-300 dark:border-gray-600">
+                                            <div class="text-6xl font-extrabold text-center py-48 text-gray-500">Insert Diagrams</div>
+                                        </div>
+                                     </div>
+
                                     <!-- 4.2 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_2'">
+                                        <div class="p-2 my-3 border-4 border-dashed border-gray-300 dark:border-gray-600">
+                                            <div class="text-6xl font-extrabold text-center py-48 text-gray-500">Insert Diagrams</div>
+                                        </div>
+
                                         <div class="">
+                                            <p class="font-semibold my-5" >4.2.1 Description of Account Data Flows</p>
                                             <table class="table border">
                                                 <tr>
                                                     <td class="p-2" colspan="2">
@@ -452,20 +489,19 @@
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="flex p-2">
-                                                        <div
-                                                            class="flex gap-3"
-                                                            v-for="(item,key) in ['Authorization', 'Capture', 'Settlement', 'Chargeback/Dispute', 'Refunds', 'Other']"
-                                                        >
-                                                            <input type="hidden" :name="`${item}_${key}`" :value="defaultValues.notChecked" />
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="`${item}_${key}`"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="inputValues[`${item}_${key}`] && inputValues[`${item}_${key}`] == '☒'"
-                                                                :value="defaultValues.checked"
-                                                            />
-                                                            <label for="">{{ item }}</label>
+                                                    <td class="flex p-4">
+                                                        <div class="flex items-center flex-wrap gap-4">
+                                                            <div class="flex items-center gap-4">
+                                                                <div v-for="(item, key) in ['Authorization', 'Capture', 'Settlement', 'Chargeback/Dispute', 'Refunds', 'Other']" :key="key" class="flex items-center space-x-4">
+                                                                    <label class="flex items-center space-x-1">
+                                                                        <PcidssCheckbox
+                                                                            :name="`${item}_${key}`"
+                                                                            :inputValue="inputValues[`${item}_${key}`]"
+                                                                        />
+                                                                        <span class="text-gray-700 cursor-pointer">{{ item }}</span>
+                                                                    </label>
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -491,19 +527,17 @@
                                                 </tr>
                                                 <tr v-for="item in 2">
                                                     <td class="border border-slate-900 p-3">
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[`accountDataFlows_4_2_${item}`] ?? defaultValues.placeholder"
+                                                        <PcidssTextarea
                                                             :name="`accountDataFlows_4_2_${item}`"
+                                                            :inputValue = "inputValues[`accountDataFlows_4_2_${item}`]"
+                                                            :rows="1"
                                                         />
                                                     </td>
                                                     <td class="border border-slate-900 p-3">
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[`descriptionInclude_4_2_${item}`] ?? defaultValues.placeholder"
+                                                        <PcidssTextarea
                                                             :name="`descriptionInclude_4_2_${item}`"
+                                                            :inputValue = "inputValues[`descriptionInclude_4_2_${item}`]"
+                                                            :rows="1"
                                                         />
                                                     </td>
                                                 </tr>
@@ -535,12 +569,11 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                    <td class="border border-slate-900" v-for="name in row?.names">
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[name] ?? defaultValues.placeholder"
+                                                    <td class="border border-slate-900 w-[20%]" v-for="name in row?.names">
+                                                        <PcidssTextarea
                                                             :name="name"
+                                                            :inputValue = "inputValues[name]"
+                                                            :rows="1"
                                                         />
                                                     </td>
                                                 </tr>
@@ -569,77 +602,58 @@
                                                     <td class="border border-slate-900 p-2">Indicate whether SAD is stored post authorization:</td>
                                                     <td class="border border-slate-900 p-2">
                                                         <div class="flex gap-2">
-                                                            <div class="flex gap-2">
-                                                                <input
-                                                                    type="hidden"
-                                                                    :name="`indicateWhetherSADAuthorization_4_3_1`"
-                                                                    :value="defaultValues.notChecked"
-                                                                />
-                                                                <input
-                                                                    type="checkbox"
-                                                                    :name="`indicateWhetherSADAuthorization_4_3_1`"
-                                                                    class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                    :checked="inputValues[`indicateWhetherSADAuthorization_4_3_1`] && inputValues[`indicateWhetherSADAuthorization_4_3_1`] == '☒'"
-                                                                    :value="defaultValues.checked"
-                                                                />
-
-                                                                <label for="indicateWhetherSADAuthorization_4_3_1_yes">Yes</label>
+                                                            <div class="flex items-center gap-4">
+                                                                <div class="flex items-center space-x-4">
+                                                                    <label class="flex items-center space-x-1">
+                                                                        <PcidssCheckbox
+                                                                            :name="`indicateWhetherSADAuthorization_4_3_1_yes`"
+                                                                            :inputValue="inputValues[`indicateWhetherSADAuthorization_4_3_1_yes`]"
+                                                                        />
+                                                                        <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                                    </label>
+                                                                </div>
                                                             </div>
 
-                                                            <div class="flex gap-2">
-                                                                <input
-                                                                    type="hidden"
-                                                                    :name="`indicateWhetherSADAuthorization_4_3_1`"
-                                                                    :value="defaultValues.notChecked"
-                                                                />
-                                                                <input
-                                                                    type="checkbox"
-                                                                    :name="`indicateWhetherSADAuthorization_4_3_1`"
-                                                                    class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                    :checked="inputValues[`indicateWhetherSADAuthorization_4_3_1`] && inputValues[`indicateWhetherSADAuthorization_4_3_1`] == '☒'"
-                                                                    :value="defaultValues.checked"
-                                                                />
-
-                                                                <label for="indicateWhetherSADAuthorization_4_3_1_no">No</label>
+                                                            <div class="flex items-center gap-4">
+                                                                <div class="flex items-center space-x-4">
+                                                                    <label class="flex items-center space-x-1">
+                                                                        <PcidssCheckbox
+                                                                            :name="`indicateWhetherSADAuthorization_4_3_1_no`"
+                                                                            :inputValue="inputValues[`indicateWhetherSADAuthorization_4_3_1_no`]"
+                                                                        />
+                                                                        <span class="text-gray-700 cursor-pointer">No</span>
+                                                                    </label>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </td>
                                                 </tr>
                                                 <tr>
-                                                    <td class="border border-slate-900 p-2">Indicate whether SAD is stored as part of Issuer functions:</td>
+                                                    <td class="border border-slate-900 p-2 w-[50%]">Indicate whether SAD is stored as part of Issuer functions:</td>
                                                     <td class="border border-slate-900 p-2">
                                                         <div class="flex gap-2">
-                                                            <div class="flex items-center justify-center gap-2">
-                                                                <input
-                                                                    type="hidden"
-                                                                    :name="`indicateWhetherSADIssuerFunction_4_3_1`"
-                                                                    :value="defaultValues.notChecked"
-                                                                />
-                                                                <input
-                                                                    type="checkbox"
-                                                                    :name="`indicateWhetherSADIssuerFunction_4_3_1`"
-                                                                    class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                    :checked="inputValues['indicateWhetherSADIssuerFunction_4_3_1'] && inputValues['indicateWhetherSADIssuerFunction_4_3_1'] == '☒'"
-                                                                    :value="defaultValues.checked"
-                                                                />
-                                                                <label for="indicateWhetherSADIssuerFunction_4_3_1_yes">Yes</label>
+                                                            <div class="flex items-center gap-4">
+                                                                <div class="flex items-center space-x-4">
+                                                                    <label class="flex items-center space-x-1">
+                                                                        <PcidssCheckbox
+                                                                            :name="`indicateWhetherSADIssuerFunction_4_3_1_yes`"
+                                                                            :inputValue="inputValues[`indicateWhetherSADIssuerFunction_4_3_1_yes`]"
+                                                                        />
+                                                                        <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                                    </label>
+                                                                </div>
                                                             </div>
 
-                                                            <div class="flex items-center justify-center gap-2">
-                                                                <input
-                                                                    type="hidden"
-                                                                    :name="`indicateWhetherSADIssuerFunction_4_3_1`"
-                                                                    :value="defaultValues.notChecked"
-                                                                />
-                                                                <input
-                                                                    type="checkbox"
-                                                                    :name="`indicateWhetherSADIssuerFunction_4_3_1`"
-                                                                    class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                    :checked="inputValues['indicateWhetherSADIssuerFunction_4_3_1'] && inputValues['indicateWhetherSADIssuerFunction_4_3_1'] == '☒'"
-                                                                    :value="defaultValues.checked"
-                                                                />
-
-                                                                <label for="indicateWhetherSADAuthorization_4_3_1_no">No</label>
+                                                            <div class="flex items-center gap-4">
+                                                                <div class="flex items-center space-x-4">
+                                                                    <label class="flex items-center space-x-1">
+                                                                        <PcidssCheckbox
+                                                                            :name="`indicateWhetherSADAuthorization_4_3_1_no`"
+                                                                            :inputValue="inputValues[`indicateWhetherSADAuthorization_4_3_1_no`]"
+                                                                        />
+                                                                        <span class="text-gray-700 cursor-pointer">No</span>
+                                                                    </label>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </td>
@@ -652,84 +666,66 @@
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_4'">
                                         <table class="table-bordered table border-secondary">
                                             <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 text-center" rowspan="2">Company Name</th>
-                                                <th class="border border-slate-900 p-3 text-center" rowspan="2">
+                                                <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">Company Name</th>
+                                                <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">
                                                     Identify what account data is shared, or if account data is not shared, how the organization could impact
                                                     the security of account data<sup>1</sup>
                                                 </th>
-                                                <th class="border border-slate-900 p-3 text-center" rowspan="2">
+                                                <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">
                                                     Describe the purpose for utilizing the service provider<sup>2</sup>
                                                 </th>
-                                                <th class="border border-slate-900 p-3 text-center" colspan="2">
+                                                <th class="border border-slate-900 p-3 text-center w-[10%]" colspan="2">
                                                     Has the third party been assessed separately against PCI DSS?
                                                 </th>
-                                                <th class="border border-slate-900 p-3 text-center" colspan="2">
+                                                <th class="border border-slate-900 p-3 text-center w-[30%]" colspan="2">
                                                     If Yes,<br />
                                                     identify the date and PCI DSS version of the AOC
                                                 </th>
-                                                <th class="border border-slate-900 p-3 text-center" colspan="2">
+                                                <th class="border border-slate-900 p-3 text-center w-[10%]" colspan="2">
                                                     If No, were the services provided by the third party included in this assessment?
                                                 </th>
                                             </tr>
                                             <tr style="background-color: #e1e1e1">
-                                                <!-- <td></td> -->
-                                                <td class="border border-slate-900 p-2">Yes</td>
-                                                <td class="border border-slate-900 p-2">No</td>
-                                                <td class="border border-slate-900 p-2">Date</td>
-                                                <td class="border border-slate-900 p-2">Version</td>
-                                                <td class="border border-slate-900 p-2">Yes</td>
-                                                <td class="border border-slate-900 p-2">No</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2 w-[20%]">Date</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2 w-[10%]">Version</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-1" v-for="(td, key) in row?.names">
+                                                <td style="text-align:center;" class="border border-slate-900 p-1" v-for="(td, key) in row?.names">
                                                     <div v-if="key === 3 || key === 4 || key === 7 || key === 8">
                                                         <div v-if="key === 3">
-                                                            <input type="hidden" :name="`${td}_yes`" :value="defaultValues.notChecked" />
-                                                            <input
-                                                                type="checkbox"
+                                                            <PcidssCheckbox
                                                                 :name="`${td}_yes`"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="(inputValues[`${td}_yes`] && inputValues[`${td}_yes`] == '☒') ?? key == 1"
-                                                                :value="defaultValues.checked"
+                                                                :inputValue="inputValues[`${td}_yes`]"
                                                             />
                                                         </div>
                                                         <div v-if="key === 4">
-                                                            <input type="hidden" :name="`${td}_no`" :value="defaultValues.notChecked" />
-                                                            <input
-                                                                type="checkbox"
+                                                            <PcidssCheckbox
                                                                 :name="`${td}_no`"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="(inputValues[`${td}_no`] && inputValues[`${td}_no`] == '☒') ?? key == 1"
-                                                                :value="defaultValues.checked"
+                                                                :inputValue="inputValues[`${td}_no`]"
                                                             />
                                                         </div>
                                                         <div v-if="key === 7">
-                                                            <input type="hidden" :name="`${td}_yes`" :value="defaultValues.notChecked" />
-                                                            <input
-                                                                type="checkbox"
+                                                            <PcidssCheckbox
                                                                 :name="`${td}_yes`"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="(inputValues[`${td}_yes`] && inputValues[`${td}_yes`] == '☒') ?? key == 1"
-                                                                :value="defaultValues.checked"
+                                                                :inputValue="inputValues[`${td}_yes`]"
                                                             />
                                                         </div>
                                                         <div v-if="key === 8">
-                                                            <input type="hidden" :name="`${td}_no`" :value="defaultValues.notChecked" />
-                                                            <input
-                                                                type="checkbox"
+                                                            <PcidssCheckbox
                                                                 :name="`${td}_no`"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="(inputValues[`${td}_no`] && inputValues[`${td}_no`] == '☒') ?? key == 1"
-                                                                :value="defaultValues.checked"
+                                                                :inputValue="inputValues[`${td}_no`]"
                                                             />
                                                         </div>
                                                     </div>
                                                     <div v-else>
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[td] ?? defaultValues.placeholder"
+                                                        <PcidssTextarea
                                                             :name="td"
+                                                            :inputValue="inputValues[td]"
+                                                            :rows="1"
                                                         />
                                                     </div>
                                                 </td>
@@ -744,135 +740,133 @@
 
                                     <!-- 4.5 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_5'">
-                                        <table class="mt-3">
-                                            <tr class="border border-slate-900 text-center" style="background-color: teal; color: white">
-                                                <th class="p-2">Network Name (In scope)</th>
-                                                <th class="p-2">Type of Network</th>
-                                                <th class="p-2">Function/ Purpose of Network</th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-2" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
-                                                </td>
-                                            </tr>
-                                        </table>
-                                        <div class="mt-5">
-                                            Describe all networks that do not store, process, and/or transmit Account Data but are still in scope—for example,
-                                            connected to the CDE or provide management functions to the CDE, etc.
+                                        <div v-for="(table) in JSON.parse(data?.form)?.tableBody">
+                                            <p class="font-semibold my-5" v-html="table?.title" />
+                                            <table class="mt-3">
+                                                <tr class="border border-slate-900 text-center" style="background-color: teal; color: white">
+                                                    <th class="p-2 w-[33%]">Network Name (In scope)</th>
+                                                    <th class="p-2">Type of Network</th>
+                                                    <th class="p-2 w-[33%]">Function/ Purpose of Network</th>
+                                                </tr>
+                                                <tr v-for="row in table?.names">
+                                                    <td class="border border-slate-900 p-2" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </table>
                                         </div>
                                     </div>
 
                                     <!-- 4.6 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_6'">
                                         <table class="mt-3">
-                                            <tr class="text-center" style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-2 text-center">
+                                            <tr class="text-center" style="background-color: teal; color: white ;text-align: center;">
+                                                <th class="border border-slate-900 p-2 text-center w-[33%]">
                                                     Facility Type (Datacenters, corporate office, call center, mail processing facility, etc.)
                                                 </th>
                                                 <th class="border border-slate-900 p-2 text-center">
                                                     Total Number of Locations (How many locations of this type are in scope)
                                                 </th>
-                                                <th class="border border-slate-900 p-2 text-center">Location(s) of Facility (for example, city, country)</th>
+                                                <th class="border border-slate-900 p-2 text-center w-[33%]">Location(s) of Facility (for example, city, country)</th>
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-2" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
-                                        <div class="mt-5">
-                                            Describe all networks that do not store, process, and/or transmit Account Data but are still in scope—for example,
-                                            connected to the CDE or provide management functions to the CDE, etc.
-                                        </div>
                                     </div>
 
                                     <!-- 4.7 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_7'">
                                         <table class="mt-3">
                                             <tr class="text-center" style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 text-center font-semibold">Type of System Component <sup>1</sup></th>
-                                                <th class="border border-slate-900 p-3 text-center font-semibold">
-                                                    Total Number of System Components <sup>2</sup>
-                                                </th>
-                                                <th class="border border-slate-900 p-3 text-center font-semibold">Vendor</th>
-                                                <th class="border border-slate-900 p-3 text-center font-semibold">Product Name and Version</th>
-                                                <th class="border border-slate-900 p-3 text-center font-semibold">Role/Function Description</th>
+                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Type of System Component <sup>1</sup></th>
+                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Total Number of System Components <sup>2</sup></th>
+                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Vendor</th>
+                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Product Name and Version</th>
+                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Role/Function Description</th>
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-2" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
+                                        <div class="mt-5">
+                                            <p>1	For example, application, firewall, server, IDS, Anti-malware software, database, and so on.</p>
+                                            <p>2	How many system components of this type are in scope.</p>
+                                        </div>
                                     </div>
 
                                     <!-- 5.1 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_1'">
                                         <table class="table-bordered table border-secondary">
                                             <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-2 text-center text-white" rowspan="2">Date of the Scan(s)</th>
-                                                <th class="border border-slate-900 p-2 text-center text-white" rowspan="2">
+                                                <th class="border border-slate-900 p-2 text-center text-white w-[15%]" rowspan="2">Date of the Scan(s)</th>
+                                                <th class="border border-slate-900 p-2 text-center text-white w-[15%]" rowspan="2">
                                                     Name of ASV that Performed the Scan
                                                 </th>
-                                                <th class="border border-slate-900 p-2 text-center text-white" colspan="2">
+                                                <th class="border border-slate-900 p-2 text-center text-white w0-[10%]" colspan="2">
                                                     Were any vulnerabilities found that resulted in a failed initial scan?
                                                 </th>
-                                                <th class="border border-slate-900 p-2 text-center text-white" rowspan="2">
+                                                <th class="border border-slate-900 p-2 text-center text-white w-[60%]" rowspan="2">
                                                     For all scans resulting in a Fail, provide date(s) of re-scans showing that the vulnerabilities have been
                                                     corrected
                                                 </th>
                                             </tr>
-                                            <tr style="background-color: #e1e1e1">
+                                            <tr style="background-color: #e1e1e1;text-align: center;">
                                                 <td class="border border-slate-900 p-2 text-center">Yes</td>
                                                 <td class="border border-slate-900 p-2 text-center">No</td>
                                             </tr>
                                             <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues[row?.names[0]] ?? defaultValues.placeholder"
+                                                <td class="border border-slate-900 p-2" style="text-align: center;">
+                                                    <PcidssTextarea
                                                         :name="row?.names[0]"
+                                                        :inputValue = "inputValues[row?.names[0]]"
+                                                        :rows="1"
                                                     />
                                                 </td>
 
                                                 <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues[row?.names[1]] ?? defaultValues.placeholder"
+                                                    <PcidssTextarea
                                                         :name="row?.names[1]"
+                                                        :inputValue = "inputValues[row?.names[1]]"
+                                                        :rows="1"
                                                     />
                                                 </td>
 
-                                                <td class="border border-slate-900 p-2">
-                                                    <input type="hidden" :name="row?.names[2]" :value="defaultValues.notChecked" />
-                                                    <input
-                                                        type="checkbox"
+                                                <td class="border border-slate-900 p-2" style="text-align: center;">
+                                                    <PcidssCheckbox
                                                         :name="row?.names[2]"
-                                                        class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                        :checked="inputValues[row?.names[2]] && inputValues[row?.names[2]] == '☒'"
-                                                        :value="defaultValues.checked"
+                                                        :inputValue="inputValues[row?.names[2]]"
                                                     />
                                                 </td>
 
-                                                <td class="border border-slate-900 p-2">
-                                                    <input type="hidden" :name="row?.names[3]" :value="defaultValues.notChecked" />
-                                                    <input
-                                                        type="checkbox"
+                                                <td class="border border-slate-900 p-2" style="text-align: center;">
+                                                    <PcidssCheckbox
                                                         :name="row?.names[3]"
-                                                        class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                        :checked="inputValues[row?.names[3]] && inputValues[row?.names[3]] == '☒'"
-                                                        :value="defaultValues.checked"
+                                                        :inputValue="inputValues[row?.names[3]]"
                                                     />
                                                 </td>
 
                                                 <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues[row?.names[4]] ?? defaultValues.placeholder"
+                                                    <PcidssTextarea
                                                         :name="row?.names[4]"
+                                                        :inputValue = "inputValues[row?.names[4]]"
+                                                        :rows="1"
                                                     />
                                                 </td>
                                             </tr>
@@ -884,45 +878,24 @@
                                                     Indicate whether this is the assessed entity’s initial PCI DSS assessment against the ASV scan requirements.
                                                 </td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <div class="d-flex gap-2">
-                                                        <div class="flex gap-3">
-                                                            <input
-                                                                type="hidden"
-                                                                :name="'assessedEntityInitialPciDssAssessment_5_1_yes'"
-                                                                :value="defaultValues.notChecked"
-                                                            />
-
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="'assessedEntityInitialPciDssAssessment_5_1_yes'"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="
-                                                                    inputValues['assessedEntityInitialPciDssAssessment_5_1_yes'] &&
-                                                                    inputValues['assessedEntityInitialPciDssAssessment_5_1_yes'] == '☒'
-                                                                "
-                                                                :value="defaultValues.checked"
-                                                            />
-                                                            <label for="assessedEntityInitialPciDssAssessment_5_1_yes">Yes</label>
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`assessedEntityInitialPciDssAssessment_5_1_yes`"
+                                                                    :inputValue="inputValues[`assessedEntityInitialPciDssAssessment_5_1_yes`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                            </label>
                                                         </div>
-
-                                                        <div class="flex gap-3">
-                                                            <input
-                                                                type="hidden"
-                                                                :name="'assessedEntityInitialPciDssAssessment_5_1_no'"
-                                                                :value="defaultValues.notChecked"
-                                                            />
-
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="'assessedEntityInitialPciDssAssessment_5_1_no'"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="
-                                                                    inputValues['assessedEntityInitialPciDssAssessment_5_1_no'] &&
-                                                                    inputValues['assessedEntityInitialPciDssAssessment_5_1_no'] == '☒'
-                                                                "
-                                                                :value="defaultValues.checked"
-                                                            />
-                                                            <label for="assessedEntityInitialPciDssAssessment_5_1_no">No</label>
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`assessedEntityInitialPciDssAssessment_5_1_no`"
+                                                                    :inputValue="inputValues[`assessedEntityInitialPciDssAssessment_5_1_no`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">No</span>
+                                                            </label>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -933,22 +906,20 @@
                                                     and procedures requiring scanning at least once every three months going forward.
                                                 </td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues['proceduresRequiringScanning_5_1'] ?? defaultValues.placeholder"
-                                                        :name="'proceduresRequiringScanning_5_1'"
+                                                    <PcidssTextarea
+                                                        :name="`proceduresRequiringScanning_5_1`"
+                                                        :inputValue = "inputValues[`proceduresRequiringScanning_5_1`]"
+                                                        :rows="1"
                                                     />
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="border border-slate-900 p-2">Assessor comments, if applicable:</td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues['assessorCommentsApplicable_5_1'] ?? defaultValues.placeholder"
-                                                        :name="'assessorCommentsApplicable_5_1'"
+                                                    <PcidssTextarea
+                                                        :name="`assessorCommentsApplicable_5_1`"
+                                                        :inputValue = "inputValues[`assessorCommentsApplicable_5_1`]"
+                                                        :rows="1"
                                                     />
                                                 </td>
                                             </tr>
@@ -965,45 +936,24 @@
                                                     scoped for the ASV scans.
                                                 </td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <div class="d-flex gap-2">
-                                                        <div class="flex gap-3">
-                                                            <input
-                                                                type="hidden"
-                                                                :name="'attestationsScanComplianceConfirming_5_2_yes'"
-                                                                :value="defaultValues.notChecked"
-                                                            />
-
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="'attestationsScanComplianceConfirming_5_2_yes'"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="
-                                                                    inputValues['attestationsScanComplianceConfirming_5_2_yes'] &&
-                                                                    inputValues['attestationsScanComplianceConfirming_5_2_yes'] == '☒'
-                                                                "
-                                                                :value="defaultValues.checked"
-                                                            />
-                                                            <label for="attestationsScanComplianceConfirming_5_2_yes">Yes</label>
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`attestationsScanComplianceConfirming_5_2_yes`"
+                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_2_yes`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                            </label>
                                                         </div>
-
-                                                        <div class="flex gap-3">
-                                                            <input
-                                                                type="hidden"
-                                                                :name="'attestationsScanComplianceConfirming_5_2_no'"
-                                                                :value="defaultValues.notChecked"
-                                                            />
-
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="'attestationsScanComplianceConfirming_5_2_no'"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="
-                                                                    inputValues['attestationsScanComplianceConfirming_5_2_no'] &&
-                                                                    inputValues['attestationsScanComplianceConfirming_5_2_no'] == '☒'
-                                                                "
-                                                                :value="defaultValues.checked"
-                                                            />
-                                                            <label for="attestationsScanComplianceConfirming_5_2_no">No</label>
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`attestationsScanComplianceConfirming_5_2_no`"
+                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_2_no`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">No</span>
+                                                            </label>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1015,42 +965,36 @@
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_3'">
                                         <table class="table-bordered table border-secondary">
                                             <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-2" rowspan="2">Date of the Scan(s)</th>
-                                                <th class="border border-slate-900 p-2" colspan="2">Was the scan performed via authenticated scanning?</th>
-                                                <th class="border border-slate-900 p-2" colspan="2">
+                                                <th class="border border-slate-900 p-2 w-[29%]" rowspan="2">Date of the Scan(s)</th>
+                                                <th class="border border-slate-900 p-2 w-[10%]" colspan="2">Was the scan performed via authenticated scanning?</th>
+                                                <th class="border border-slate-900 p-2 w-[10%]" colspan="2">
                                                     Were any high-risk or critical vulnerabilities per the entity's vulnerability risk rankings at Requirement
                                                     6.3.1 found?
                                                 </th>
-                                                <th class="border border-slate-900 p-2" rowspan="2">
+                                                <th class="border border-slate-900 p-2 w-[50%]" rowspan="2">
                                                     For all scans where high-risk or critical vulnerabilities were found, provide date(s) of re-scans showing
                                                     that the vulnerabilities have been corrected.
                                                 </th>
                                             </tr>
                                             <tr style="background-color: #dfdfdf">
-                                                <td class="border border-slate-900 p-2">Yes</td>
-                                                <td class="border border-slate-900 p-2">No</td>
-                                                <td class="border border-slate-900 p-2">Yes</td>
-                                                <td class="border border-slate-900 p-2">No</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
+                                                <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
                                             </tr>
                                             <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-2" v-for="(td, key) in row?.names">
+                                                <td style="text-align:center;" class="border border-slate-900 p-2" v-for="(td, key) in row?.names">
                                                     <div v-if="key === 1 || key === 2 || key === 3 || key === 4">
-                                                        <input type="hidden" :name="td" :value="defaultValues.notChecked" />
-
-                                                        <input
-                                                            type="checkbox"
+                                                        <PcidssCheckbox
                                                             :name="td"
-                                                            class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                            :checked="inputValues[td] && inputValues[td] == '☒'"
-                                                            :value="defaultValues.checked"
+                                                            :inputValue="inputValues[td]"
                                                         />
                                                     </div>
                                                     <div v-else>
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[td] ?? defaultValues.placeholder"
+                                                        <PcidssTextarea
                                                             :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
                                                         />
                                                     </div>
                                                 </td>
@@ -1065,46 +1009,24 @@
                                                     scoped for the ASV scans.
                                                 </td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <div class="d-flex gap-2">
-                                                        <div class="flex gap-2">
-                                                            <input
-                                                                type="hidden"
-                                                                :name="'attestationsScanComplianceConfirming_5_3_yes'"
-                                                                :value="defaultValues.notChecked"
-                                                            />
-
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="'attestationsScanComplianceConfirming_5_3_yes'"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="
-                                                                    inputValues['attestationsScanComplianceConfirming_5_3_yes'] &&
-                                                                    inputValues['attestationsScanComplianceConfirming_5_3_yes'] == '☒'
-                                                                "
-                                                                :value="defaultValues.checked"
-                                                            />
-
-                                                            <label for="attestationsScanComplianceConfirming_5_3_yes">Yes</label>
+                                                    <div class="flex items-center gap-4">
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`attestationsScanComplianceConfirming_5_3_yes`"
+                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_3_yes`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                            </label>
                                                         </div>
-
-                                                        <div class="flex gap-2">
-                                                            <input
-                                                                type="hidden"
-                                                                :name="'attestationsScanComplianceConfirming_5_3_no'"
-                                                                :value="defaultValues.notChecked"
-                                                            />
-
-                                                            <input
-                                                                type="checkbox"
-                                                                :name="'attestationsScanComplianceConfirming_5_3_no'"
-                                                                class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                                :checked="
-                                                                    inputValues['attestationsScanComplianceConfirming_5_3_no'] &&
-                                                                    inputValues['attestationsScanComplianceConfirming_5_3_no'] == '☒'
-                                                                "
-                                                                :value="defaultValues.checked"
-                                                            />
-                                                            <label for="attestationsScanComplianceConfirming_5_3_no">No</label>
+                                                        <div class="flex items-center space-x-4">
+                                                            <label class="flex items-center space-x-1">
+                                                                <PcidssCheckbox
+                                                                    :name="`attestationsScanComplianceConfirming_5_3_no`"
+                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_3_no`]"
+                                                                />
+                                                                <span class="text-gray-700 cursor-pointer">No</span>
+                                                            </label>
                                                         </div>
                                                     </div>
                                                 </td>
@@ -1115,22 +1037,20 @@
                                                     and procedures requiring scanning at least once every three months going forward.
                                                 </td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues['documentedPoliciesProcedures_5_3'] ?? defaultValues.placeholder"
-                                                        :name="'documentedPoliciesProcedures_5_3'"
+                                                    <PcidssTextarea
+                                                        :name="`documentedPoliciesProcedures_5_3`"
+                                                        :inputValue = "inputValues[`documentedPoliciesProcedures_5_3`]"
+                                                        :rows="3"
                                                     />
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td class="border border-slate-900 p-2">Assessor comments, if applicable:</td>
                                                 <td class="border border-slate-900 p-2">
-                                                    <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues['assessorCommentsApplicable_5_3'] ?? defaultValues.placeholder"
-                                                        :name="'assessorCommentsApplicable_5_3'"
+                                                    <PcidssTextarea
+                                                        :name="`assessorCommentsApplicable_5_3`"
+                                                        :inputValue = "inputValues[`assessorCommentsApplicable_5_3`]"
+                                                        :rows="1"
                                                     />
                                                 </td>
                                             </tr>
@@ -1141,16 +1061,20 @@
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '14_1_3'">
                                         <table class="mt-5 table">
                                             <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold">Tested Sample</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Sample Type Description</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">All Items in Sample Set?</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Selection Method</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Total Sampled</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Total Population</th>
+                                                <th class="border border-slate-900 p-3 font-semibold w-[15%]">Tested Sample</th>
+                                                <th class="border border-slate-900 p-3 font-semibold w-[25%]">Sample Type Description</th>
+                                                <th class="border border-slate-900 p-3 font-semibold w-[25%]">All Items in Sample Set?</th>
+                                                <th class="border border-slate-900 p-3 font-semibold w-[15%]">Selection Method</th>
+                                                <th class="border border-slate-900 p-3 font-semibold w-[10%]">Total Sampled</th>
+                                                <th class="border border-slate-900 p-3 font-semibold w-[10%]">Total Population</th>
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
@@ -1167,6 +1091,7 @@
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-3" v-for="td in row?.names">
+
                                                     <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
                                                 </td>
                                             </tr>
@@ -1372,24 +1297,115 @@
                                 <div v-else>
                                     <table class="border border-slate-900" v-if="!JSON.parse(data?.form)?.isRequirement">
                                         <tr class="border border-slate-900" v-for="row in JSON.parse(data?.form)?.tableBody">
+                                            <!-- Title Show -->
                                             <td
-                                                class="w-[45%] border border-slate-900 p-2"
-                                                v-if="row?.title"
+                                                class="px-2"
+                                                :class="{
+                                                    'font-bold  py-2': row?.colspan,
+                                                }"
+                                                :style="{
+                                                    backgroundColor: row?.bg,
+                                                    color: row?.bg ? 'white' : 'black',
+                                                }"
                                                 :colspan="row?.colspan"
-                                                :class="row?.bg && `text-lg font-semibold text-white`"
-                                                :style="`background-color:${row?.bg}`"
-                                            >
-                                                {{ row?.title }}
+                                                v-if="row?.title"
+                                                v-html="row?.title"
+                                            />
+
+                                            <!-- 1.3 Content Show -->
+                                            <td class="w-[55%] border border-slate-900 p-2" v-if="row?.pciDss === '1.3'">
+                                                <div class="space-y-1">
+                                                    <label class="flex items-center space-x-1" v-for="(item, key) in row?.content">
+                                                        <PcidssCheckbox
+                                                            :name="item?.name"
+                                                            :inputValue="inputValues[item?.name]"
+                                                        />
+                                                        <span class="text-gray-700 cursor-pointer">{{ item?.label}}</span>
+                                                    </label>
+                                                </div>
                                             </td>
 
-                                            <td class="w-[55%] border border-slate-900 p-2" v-if="row?.content" v-html="row?.content" />
+                                            <!-- 1.4 Content Show -->
+                                            <td class="w-[55%] border border-slate-900 p-2" v-if="row?.pciDss === '1.4'">
+                                                <div class="flex items-center gap-4">
+                                                    <div v-for="(item, key) in row?.content" :key="key" class="flex items-center space-x-4">
+                                                        <label class="flex items-center space-x-1">
+                                                            <PcidssCheckbox
+                                                                :name="item?.name"
+                                                                :inputValue="inputValues[item?.name]"
+                                                            />
+                                                            <span class="text-gray-700 cursor-pointer">{{ item?.label}}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
 
-                                            <td class="w-[55%] border border-slate-900 p-2" v-if="row?.name">
-                                                <input
-                                                    class="form-input"
-                                                    type="text"
-                                                    :value="inputValues[row?.name] ?? defaultValues.placeholder"
+                                            <!-- 1.5 Content Show -->
+                                            <td class="w-[55%] border border-slate-900 p-2" v-if="row?.pciDss === '1.5'">
+                                                <div class="flex items-center gap-4">
+                                                    <div v-for="(item, key) in row?.content" :key="key" class="flex items-center space-x-4">
+                                                        <label class="flex items-center space-x-1">
+                                                            <PcidssCheckbox
+                                                                :name="`${item?.name}`"
+                                                                :inputValue="inputValues[`${item?.name}`]"
+                                                            />
+                                                            <span class="text-gray-700 cursor-pointer">{{ item?.label}}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- 1.7 Content Show -->
+                                            <tr v-if="row?.pciDss === '1.7'" v-for="(item, key) in row?.content" :key="key">
+                                                <!-- First column with checkbox -->
+                                                <td class="w-[15%] border border-slate-900 p-2 text-center">
+                                                    <PcidssCheckbox
+                                                    :name="item?.name"
+                                                    :inputValue="inputValues[item?.name]"
+                                                    />
+                                                </td>
+                                                <!-- Second column with text -->
+                                                <td class="w-[85%] border border-slate-900 p-2">
+                                                    <span class="text-gray-700 cursor-pointer">{{ item?.title }}</span>
+                                                </td>
+                                            </tr>
+
+                                            <!-- 2.1 for second last multiple checkbox -->
+                                            <td class="w-[60%] border border-slate-900 p-2" v-if="row?.checkboxContent">
+                                                <div class="flex items-center gap-4">
+                                                    <div v-for="(item, key) in row?.checkboxContent" :key="key" class="flex items-center space-x-4">
+                                                        <label class="flex items-center space-x-1">
+                                                            <PcidssCheckbox
+                                                                :name="`${item?.name}`"
+                                                                :inputValue="inputValues[`${item?.name}`]"
+                                                            />
+                                                            <span class="text-gray-700 cursor-pointer">{{ item?.label}}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- 6.1 Content Show -->
+                                            <td class="w-[55%] border border-slate-900 p-2" v-if="row?.pciDss === '3.2' || row?.pciDss === '6.1' || row?.pciDss === '6.2'">
+                                                <div class="flex items-center gap-4">
+                                                    <div v-for="(item, key) in row?.content" :key="key" class="flex items-center space-x-4">
+                                                        <label class="flex items-center space-x-1">
+                                                            <PcidssCheckbox
+                                                                :name="`${item?.name}`"
+                                                                :inputValue="inputValues[`${item?.name}`]"
+                                                            />
+                                                            <span class="text-gray-700 cursor-pointer">{{ item?.label}}</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <!-- default apply for all -->
+                                            <td class="w-[60%] border border-slate-900 p-2" v-if="row?.name">
+                                                <PcidssTextarea
                                                     :name="row?.name"
+                                                    :inputValue = "inputValues[row?.name]"
+                                                    :rows="1"
                                                 />
                                             </td>
                                         </tr>
@@ -1427,47 +1443,44 @@
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">In Place</td>
-                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not Applicable</td>
-                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not Tested</td>
-                                                <td class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not in Place</td>
-                                                <td class="border border-slate-900 bg-pink-100 text-center text-md font-bold whitespace-nowrap">Compensating Control*</td>
-                                                <td class="border border-slate-900 bg-pink-100 text-center text-md font-bold whitespace-nowrap">Customized Approach*</td>
+                                                <td style="text-align:center;" class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">In Place</td>
+                                                <td style="text-align:center;" class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not Applicable</td>
+                                                <td style="text-align:center;" class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not Tested</td>
+                                                <td style="text-align:center;" class="border border-slate-900 bg-gray-100 text-center text-md font-bold whitespace-nowrap">Not in Place</td>
+                                                <td style="text-align:center;" class="border border-slate-900 bg-pink-100 text-center text-md font-bold whitespace-nowrap">Compensating Control*</td>
+                                                <td style="text-align:center;" class="border border-slate-900 bg-pink-100 text-center text-md font-bold whitespace-nowrap">Customized Approach*</td>
                                             </tr>
                                             <tr>
                                                 <td
                                                     v-for="(name, key) in JSON.parse(data?.form).names"
                                                     :key="key"
                                                     class="border border-slate-900 p-3 text-center"
+                                                    style="text-align: center;"
                                                 >
-                                                    <input type="hidden" :name="name" :value="defaultValues.notChecked" />
-                                                    <input
-                                                        type="checkbox"
+                                                    <PcidssCheckbox
                                                         :name="name"
-                                                        class="form-check-input h-4 w-4 border border-secondary text-center"
-                                                        :checked="(inputValues[name] && inputValues[name] == '☒') ?? key == 1"
-                                                        :value="defaultValues.checked"
+                                                        :inputValue="inputValues[name]"
+                                                        :checked="key == 1"
                                                     />
                                                 </td>
                                             </tr>
                                         </tbody>
                                         <tfoot>
                                             <tr class="bg-teal text-white">
-                                                <td class="border border-slate-900 p-3" colspan="3" style="width: 50%">
+                                                <td class="border border-slate-900 p-3 text-left" colspan="3" style="width: 50%">
                                                     <div class="text-dark" v-html="JSON.parse(data?.form)?.note?.title"></div>
                                                 </td>
-                                                <td class="border border-slate-900 p-3" colspan="3">
-                                                    <textarea
+                                                <td class="border border-slate-900 p-1" colspan="3">
+                                                    <!-- <textarea
                                                         rows="10"
                                                         class="form-input text-lg"
                                                         :name="JSON.parse(data?.form)?.note?.name"
-                                                    >{{ inputValues[JSON.parse(data?.form)?.note?.name] ?? defaultValues.placeholder }}</textarea>
-                                                    <!-- <input
-                                                        type="text"
-                                                        class="form-input"
-                                                        :value="inputValues[JSON.parse(data?.form)?.note?.name] ?? defaultValues.placeholder"
+                                                    >{{ inputValues[JSON.parse(data?.form)?.note?.name] ?? defaultValues.placeholder }}</textarea> -->
+                                                    <PcidssTextarea
                                                         :name="JSON.parse(data?.form)?.note?.name"
-                                                    /> -->
+                                                        :inputValue = "inputValues[JSON.parse(data?.form)?.note?.name]"
+                                                        :rows="10"
+                                                    />
                                                 </td>
                                             </tr>
                                         </tfoot>
@@ -1498,20 +1511,26 @@
                                         <tbody>
                                             <tr v-for="(tr, trIndex) in JSON.parse(data?.form).tableBody" :key="trIndex">
                                                 <td
-                                                    class="border border-slate-900"
+                                                    class="border border-slate-900 p-0 mb-0"
                                                     v-for="(td, tdIndex) in tr.td"
                                                     :key="tdIndex"
                                                     :rowspan="tr?.rowspan && tdIndex == 0 ? tr?.rowspan : null"
                                                 >
-                                                    <input
+                                                    <!-- <input
                                                         v-if="tdIndex === 'name'"
                                                         type="text"
                                                         class="form-input"
                                                         :name="td"
                                                         :value="inputValues[td] ?? defaultValues.placeholder"
                                                         :placeholder="defaultValues.placeholder"
+                                                    /> -->
+                                                    <PcidssTextarea
+                                                        v-if="tdIndex === 'name'"
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="4"
                                                     />
-                                                    <div v-else v-html="td"></div>
+                                                    <div v-else v-html="td" class="p-2"></div>
                                                 </td>
                                             </tr>
                                         </tbody>

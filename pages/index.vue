@@ -27,7 +27,7 @@ const { setToken, setAuthUser } = useTokenStore();
 const form = ref()
 const state = reactive({
     email: '',//undefined,
-    password: '',//undefined,
+    password: 'Z.t$jf_>CU{]Sg*6wB2?}5',//undefined,
     remember: false
 })
 
