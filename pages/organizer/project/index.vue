@@ -7,7 +7,6 @@ import { formatDate } from '~/utils/helper';
 import { deleteConfirmation } from '~/utils/helper';
 import { useTokenStore } from '~/stores/useTokenStore';
 import ButtonLoader from '~/components/ButtonLoader.vue';
-import MultipleSelect from '~/components/MultipleSelect.vue';
 
 useHead({title:'Project'})
 definePageMeta({
