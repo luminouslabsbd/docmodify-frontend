@@ -45,8 +45,22 @@
         {
             cache: true,
             immediate: true,
+
         }
     );
+
+    const { data: pciDssStatus , refresh: pciDssStatusRefresh } = useApiFetch(
+        '/user/get-menu-status',
+        {
+            method: 'POST',
+            immediate: true,
+            body: {
+                projectId: route.params.id,
+            },
+        },
+    );
+
+
 
     const setRequirementId = (id) => {
         requirementId.value = id;
@@ -94,6 +108,7 @@
 
     watch(requirementId, () => {
         refresh();
+        pciDssStatusRefresh();
     });
 
     const submitForm = async () => {
@@ -103,6 +118,7 @@
         formData.forEach((value, key) => {
             pciDss[key] = value;
         });
+
         try {
             const { data: pciDssSubmit } = await useApiFetch('/user/submit-pci-data', {
                 method: 'POST',
@@ -118,6 +134,7 @@
             isLoading.value = false;
             toast.success('Docx data create or update success!');
             fromRefresh();
+            pciDssStatusRefresh();
         } catch (error) {
             console.error('Error submitting form:', error);
         }
@@ -145,6 +162,46 @@
     // menu active and de-active system using by key
     const activeRequirement = ref(0);
     const activeDescription = ref(0);
+
+
+
+    const getStatusText = (pciDssId) =>{
+        const status = this.statusData.find(data => data.pci_id === pciDssId);
+        return status ? status.status : 'Unknown'; // Default to 'Unknown' if no status is found
+    }
+
+  // Get the background color for a given pciDss ID
+  const getStatusColor=(pciDssId)=>{
+    const status = pciDssStatus.value.find(data => data.pci_id === pciDssId);
+
+
+    const getItem = pciDssStatus.value.filter(data => data.pci_dss_id === pciDssId)
+    console.log("🚀 ~ getStatusColor ~ getItem:", getItem)
+
+
+    if(getItem){
+        if(getItem[0]?.status === 'inPlace'){
+            return "bg-[#4CAF50]"
+        }else if(getItem[0]?.status === 'notApplicable'){
+            return "bg-[#9E9E9E]"
+        }else if(getItem[0]?.status === 'notTested'){
+            return "bg-[#FFB6C1]"
+        }else if(getItem[0]?.status === 'notInPlace'){
+            return "bg-[#F44336]"
+        }else if(getItem[0]?.status === 'compensatingControl'){
+            return "bg-[#FFEB3B]"
+        }else if(getItem[0]?.status === 'customizedApproach'){
+            return "bg-[#D1C4E9]"
+        }else {
+            return "bg-gray-200"
+        }
+    }
+
+
+  }
+
+
+
 </script>
 <template>
     <div class="panel">
@@ -189,10 +246,13 @@
                                         :key="'pcidss_key_' + pciIndex"
                                     >
                                         <h3
-                                            class="mb-2 cursor-pointer rounded-sm bg-gray-100 px-2 py-1 hover:bg-info hover:text-white dark:bg-slate-700"
-                                            :class="{ 'bg-info text-white': pciDss.id === data.id }"
-                                        >
-                                           {{ pciDss?.key }}
+                                            class="mb-2 cursor-pointer rounded-sm px-2 py-1 hover:bg-info hover:text-white dark:bg-slate-700"
+                                            :class="getStatusColor(pciDss?.id) ?? bg-gray-100"
+                                            >
+
+                                            <!-- {{ getStatusColor(pciDss?.id) }} -->
+
+                                           {{ pciDss?.id }} - {{ pciDss?.key }}
                                         </h3>
                                     </li>
                                 </ul>
@@ -1091,8 +1151,11 @@
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-3" v-for="td in row?.names">
-
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
@@ -1109,7 +1172,11 @@
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>
@@ -1128,7 +1195,11 @@
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
                                                 <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <input type="text" class="form-input" :value="inputValues[td] ?? defaultValues.placeholder" :name="td" />
+                                                    <PcidssTextarea
+                                                        :name="td"
+                                                        :inputValue = "inputValues[td]"
+                                                        :rows="1"
+                                                    />
                                                 </td>
                                             </tr>
                                         </table>

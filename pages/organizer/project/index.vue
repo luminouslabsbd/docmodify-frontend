@@ -284,7 +284,7 @@ const getLastPage = computed(()=>{
                     </div>
 
                     <div>
-                        <label for="deadline">Project deadline<small class="text-red-500">*</small></label>
+                        <label for="deadline">Select Users<small class="text-red-500">*</small></label>
 
                         <div class="form-input max-h-[300px] overflow-y-scroll">
                             <label :for="user?.id" class="flex justify-between hover:bg-white-light px-3 py-1 cursor-pointer" v-for="(user,key) in users?.data?.users?.data">

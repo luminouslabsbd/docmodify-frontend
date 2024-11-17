@@ -77,7 +77,7 @@
             value:''
         },
         purpose:{
-            key:'purpose_6_4_',
+            key:'documentPurpose_6_4_',
             value:''
         },
         revision_date:{
