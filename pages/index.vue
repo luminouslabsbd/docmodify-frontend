@@ -18,16 +18,11 @@ const router = useRouter();
 const route = useRoute();
 const store = useAppStore();
 const { setLocale } = useI18n();
-
-
-
-
-
 const { setToken, setAuthUser } = useTokenStore();
 const form = ref()
 const state = reactive({
     email: '',//undefined,
-    password: 'Z.t$jf_>CU{]Sg*6wB2?}5',//undefined,
+    password: '',//undefined,
     remember: false
 })
 
@@ -41,13 +36,11 @@ const onSubmit = async () => {
     pending.value = true;
     const { data, error } = await login(state)
     errors.value = error?.value?.data
-    console.log("🚀 ~ onSubmit ~ errors:", errors.value)
     if (error?.value) {
         toast.error('Something went wrong...!')
     }
     if (!error.value) {
         setToken(data.value)
-        console.log(data.value)
         const userData = await fetchUser();
         setAuthUser(userData?.data?.value)
         if (userData?.data?.value) {

@@ -82,7 +82,6 @@ const getProjectById = async (id) => {
 
     if (status.value === 'error') {
         toast.error("Something want wrong!");
-        console.log("🚀 ~ getOrganizerById ~ error:", error.value?.data)
     }
 
     if (status.value === 'success') {
@@ -120,9 +119,6 @@ const submitForm = async () => {
     errors.value = {};
     isLoading.value = true;
     try {
-
-        console.log("form.value",form.value);
-
         const method = isEdit.value.edit ? 'PUT' : 'POST';
         const url = isEdit.value.edit
             ? `/organizer/project/${isEdit.value.id}`
@@ -147,7 +143,6 @@ const submitForm = async () => {
     } catch (error) {
         isLoading.value = false;
         toast.error('Something want wrong!')
-        console.log("🚀 ~ submitForm ~ error:", error)
     }
 }
 
@@ -160,7 +155,6 @@ const deleteProject = async (id) => {
         });
 
         if (status.value === 'error') {
-            console.log("🚀 ~ deleteOrganizer ~ error:", error.value?.data)
             toast.error("Something want wrong!");
         }
 

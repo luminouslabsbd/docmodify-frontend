@@ -146,7 +146,7 @@
     };
 
     const fetchEvidence = async () => {
-        const { data, error, status } = await useApiFetch(`/user/evidence/${selectedTab.value}`, {
+        const { data, error, status } = await useApiFetch(`/user/evidence/${selectedTab.value}/${route.params.id}`, {
             method: 'GET',
         });
         if (status.value === 'success') {
@@ -173,12 +173,7 @@
   // Get the background color for a given pciDss ID
   const getStatusColor=(pciDssId)=>{
     const status = pciDssStatus.value.find(data => data.pci_id === pciDssId);
-
-
-    const getItem = pciDssStatus.value.filter(data => data.pci_dss_id === pciDssId)
-    console.log("🚀 ~ getStatusColor ~ getItem:", getItem)
-
-
+    const getItem = pciDssStatus.value.filter(data => data.pci_dss_id === pciDssId);
     if(getItem){
         if(getItem[0]?.status === 'inPlace'){
             return "bg-[#4CAF50]"
@@ -242,17 +237,16 @@
                                 <ul class="ml-6" v-if="description.id === activeDescription">
                                     <li
                                         v-for="(pciDss, pciIndex) in description?.pci_dss"
-                                        @click.stop="setRequirementId(pciDss?.id)"
+                                        @click.stop="pciDss?.id !== 26 && pciDss?.id !== 27 && pciDss?.id !== 28 ? setRequirementId(pciDss?.id) : null"
                                         :key="'pcidss_key_' + pciIndex"
+                                        :class="{'cursor-not-allowed': pciDss?.id === 26 || pciDss?.id === 27 || pciDss?.id === 28}"
                                     >
                                         <h3
-                                            class="mb-2 cursor-pointer rounded-sm px-2 py-1 hover:bg-info hover:text-white dark:bg-slate-700"
-                                            :class="getStatusColor(pciDss?.id) ?? bg-gray-100"
-                                            >
-
-                                            <!-- {{ getStatusColor(pciDss?.id) }} -->
-
-                                           {{ pciDss?.id }} - {{ pciDss?.key }}
+                                        class="mb-2 rounded-sm px-2 py-1 hover:bg-info hover:text-white dark:bg-slate-700"
+                                        :class="getStatusColor(pciDss?.id) ?? bg-gray-100"
+                                        :style="{ cursor: pciDss?.id === 26 || pciDss?.id === 27 || pciDss?.id === 28 ? 'not-allowed' : 'pointer' }"
+                                        >
+                                        {{ pciDss?.key }}
                                         </h3>
                                     </li>
                                 </ul>

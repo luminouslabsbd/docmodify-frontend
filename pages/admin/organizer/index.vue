@@ -14,9 +14,13 @@ definePageMeta({
 
 
 const isOpen = ref(false);
+const showPass = ref({
+    newPass : false,
+    confirmPass : false,
+});
 const errors = ref({});
 const isLoading = ref(false);
-
+const passwordModal = ref(false);
 const isEdit = ref({
     edit: false,
     id: null,
@@ -52,6 +56,11 @@ const createOrganizer = () => {
     isOpen.value = true
 }
 
+const passForm = ref({
+    new_pass: '',
+    confirm_pass : '',
+})
+
 
 const page = ref(1);
 const perPage = ref(15);
@@ -78,7 +87,6 @@ const { data: organizers, error, pending, status, refresh } = useAsyncData(
     }
 )
 
-console.log("🚀 ~ organizers:", organizers?.value)
 
 const getOrganizerById = async (id) => {
     const { data, error, status } = await useApiFetch(`/admin/organizer/${id}`, {
@@ -86,7 +94,6 @@ const getOrganizerById = async (id) => {
     });
 
     if (status.value === 'error') {
-        console.log("🚀 ~ deleteOrganizer ~ error:", error.value?.data)
         toast.error("Something want wrong!");
     }
 
@@ -138,7 +145,6 @@ const deleteOrganizer = async (id) => {
         });
 
         if (status.value === 'error') {
-            console.log("🚀 ~ deleteOrganizer ~ error:", error.value?.data)
             toast.error("Something want wrong!");
         }
 
@@ -167,6 +173,33 @@ const getLastPage = computed(()=>{
     return page;
 })
 
+const submitPassForm = async () =>{
+    isLoading.value = true;
+    errors.value = {};
+    try {
+        const { data, error, pending, status } = await useApiFetch(`/admin/change-pass/${isEdit.value.id}`, {
+            method:"POST",
+            body: passForm,
+        });
+
+        if (status.value === 'error') {
+            isLoading.value = false;
+            errors.value = error.value.data.errors;
+        }
+
+        if (status.value === 'success') {
+            passForm.value.new_pass = '';
+            passForm.value.confirm_pass = '';
+            isLoading.value = false;
+            passwordModal.value = false;
+            toast.success(data.value?.message)
+        }
+    } catch (error) {
+        isLoading.value = false;
+        toast.error('Something want wrong!')
+        console.log("🚀 ~ submitPassForm ~ error:", error)
+    }
+}
 
 </script>
 
@@ -241,8 +274,14 @@ const getLastPage = computed(()=>{
     ]">
         <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
             <h2 class="text-2xl font-semibold">Organizer {{ isEdit.edit ? "Edit" : "Create" }}</h2>
-            <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
+            <div class="flex gap-2">
+                <button v-if="isEdit?.edit" @click="passwordModal = true" class="btn btn-sm btn-info">
+                    Change Pass
+                </button>
+                <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
+            </div>
         </div>
+
         <div class="p-4">
             <form @submit.prevent="submitForm">
                 <div class="space-y-5">
@@ -300,6 +339,77 @@ const getLastPage = computed(()=>{
                         <button type="submit" class="btn btn-info" :disabled="isLoading">
                             <ButtonLoader :isLoading="isLoading" />
                             {{ isEdit.edit ? 'Update' : 'Submit' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div :class="[
+        passwordModal ? 'translate-x-0' : 'translate-x-full',
+        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
+    ]">
+        <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
+            <h2 class="text-2xl font-semibold">Change Password</h2>
+            <div class="flex gap-2">
+                <button @click="passwordModal = false" class="btn btn-sm btn-info">✕</button>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <form @submit.prevent="submitPassForm">
+                <div class="space-y-5">
+                    <div>
+                        <label for="name">New Password <small class="text-red-500">*</small></label>
+                            <div class="flex">
+                                <input
+                                        v-model="passForm.new_pass"
+                                        :type="showPass.newPass ? 'text' : 'password'"
+                                        placeholder="Enter new password"
+                                        class="form-input ltr:rounded-r-none rtl:rounded-l-none"
+                                    />
+                                <div
+                                class="bg-[#eee] flex justify-center items-center ltr:rounded-r-md rtl:rounded-l-md px-3 font-semibold border ltr:border-l-0 rtl:border-r-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b] cursor-pointer"
+                                @click="showPass.newPass = !showPass.newPass">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                </div>
+                            </div>
+
+                        <p v-if="errors?.new_pass" class="text-red-500">{{ errors?.new_pass[0] }}</p>
+                    </div>
+
+                    <div>
+                        <label for="name">Confirm Password <small class="text-red-500">*</small></label>
+                            <div class="flex">
+                                <input
+                                    v-model="passForm.confirm_pass"
+                                    :type="showPass.confirmPass ? 'text' : 'password'"
+                                    placeholder="Confirm new password"
+                                    class="form-input ltr:rounded-r-none rtl:rounded-l-none"
+                                />
+                                <div
+                                class="bg-[#eee] flex justify-center items-center ltr:rounded-r-md rtl:rounded-l-md px-3 font-semibold border ltr:border-l-0 rtl:border-r-0 border-[#e0e6ed] dark:border-[#17263c] dark:bg-[#1b2e4b] cursor-pointer"
+                                @click="showPass.confirmPass = !showPass.confirmPass"
+                                >
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                </svg>
+                                </div>
+                            </div>
+
+                        <p v-if="errors?.confirm_pass" class="text-red-500">{{ errors?.confirm_pass[0] }}</p>
+                    </div>
+
+
+                    <div>
+                        <button type="submit" class="btn btn-info" :disabled="isLoading">
+                            <ButtonLoader :isLoading="isLoading" />
+                            Submit
                         </button>
                     </div>
                 </div>
