@@ -120,11 +120,7 @@
                                 <div class="flex gap-3">
                                     <NuxtLink :to="`/user/assignment/${project?.id}`" class="btn btn-info btn-sm">Assessment</NuxtLink>
                                     <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
-                                        <span
-                                            v-if="isDownloading === project?.id"
-                                            class="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white !border-l-transparent dark:border-black"
-                                        ></span>
-                                        <span>{{ isDownloading === project?.id ? 'Downloading...' : 'Download' }}</span>
+                                        <span>Download</span>
                                     </button>
                                 </div>
                             </td>
