@@ -199,7 +199,7 @@
 
 </script>
 <template>
-    <div class="panel">
+    <div class="panel font-arial">
         <div
             class="sticky top-[58px] mb-5 flex items-center justify-between border-b border-gray-100 bg-white px-3 py-3 backdrop:blur-md dark:border-slate-800 dark:bg-black-dark-light dark:text-dark-light"
         >
@@ -440,7 +440,7 @@
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_3_3'">
                                         <table class="mt-5 table">
                                             <tr>
-                                                 <td class="border border-slate-900 p-3 w-[50%]">
+                                                 <td class="border border-slate-900 p-3 w-[50%] align-top">
                                                     Indicate whether the assessed entity uses one or more PCI SSC validated products or solutions.
                                                  </td>
                                                  <td class="border border-slate-900 p-3">
@@ -493,7 +493,7 @@
                                         </table>
                                         <table class="mt-5 table">
                                             <tr>
-                                                 <td class="border border-slate-900 p-3 w-[50%]">
+                                                 <td class="border border-slate-900 p-3 w-[50%] align-top">
                                                     Provide the name of the assessor who attests that they have read the instruction manual associated with each of the software/solution(s) listed above and confirmed that the merchant has implemented the solution per the instructions and detail in the instruction manual.
                                                  </td>
                                                  <td class="border border-slate-900 p-3">
@@ -505,7 +505,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                 <td class="border border-slate-900 p-3">
+                                                 <td class="border border-slate-900 p-3 align-top">
                                                     Any additional comments or findings the assessor would like to include, if applicable.
                                                  </td>
                                                  <td class="border border-slate-900 p-3">
@@ -580,14 +580,14 @@
                                                     </td>
                                                 </tr>
                                                 <tr v-for="item in 2">
-                                                    <td class="border border-slate-900 p-3">
+                                                    <td class="border border-slate-900 p-3 align-top">
                                                         <PcidssTextarea
                                                             :name="`accountDataFlows_4_2_${item}`"
                                                             :inputValue = "inputValues[`accountDataFlows_4_2_${item}`]"
                                                             :rows="1"
                                                         />
                                                     </td>
-                                                    <td class="border border-slate-900 p-3">
+                                                    <td class="border border-slate-900 p-3 align-top">
                                                         <PcidssTextarea
                                                             :name="`descriptionInclude_4_2_${item}`"
                                                             :inputValue = "inputValues[`descriptionInclude_4_2_${item}`]"
@@ -928,7 +928,7 @@
 
                                         <table class="table-bordered mt-5 table border-secondary">
                                             <tr>
-                                                <td class="border border-slate-900 p-2" style="width: 50%">
+                                                <td class="border border-slate-900 p-2 align-top" style="width: 50%">
                                                     Indicate whether this is the assessed entity’s initial PCI DSS assessment against the ASV scan requirements.
                                                 </td>
                                                 <td class="border border-slate-900 p-2">
@@ -955,7 +955,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="border border-slate-900 p-2">
+                                                <td class="border border-slate-900 p-2 align-top">
                                                     If yes, Identify the name of the document the assessor verified to include the entity’s documented policies
                                                     and procedures requiring scanning at least once every three months going forward.
                                                 </td>
@@ -968,7 +968,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="border border-slate-900 p-2">Assessor comments, if applicable:</td>
+                                                <td class="border border-slate-900 p-2 align-top">Assessor comments, if applicable:</td>
                                                 <td class="border border-slate-900 p-2">
                                                     <PcidssTextarea
                                                         :name="`assessorCommentsApplicable_5_1`"
@@ -1057,7 +1057,7 @@
 
                                         <table class="mt-5 table">
                                             <tr>
-                                                <td class="border border-slate-900 p-2" style="width: 50%">
+                                                <td class="border border-slate-900 p-2 align-top" style="width: 50%">
                                                     Indicate whether the ASV and the assessed entity completed the Attestations of Scan Compliance, confirming
                                                     that all externally accessible (Internet-facing) IP addresses in existence at the entity were appropriately
                                                     scoped for the ASV scans.
@@ -1086,7 +1086,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="border border-slate-900 p-2">
+                                                <td class="border border-slate-900 p-2 align-top">
                                                     If yes, Identify the name of the document the assessor verified to include the entity’s documented policies
                                                     and procedures requiring scanning at least once every three months going forward.
                                                 </td>
@@ -1099,7 +1099,7 @@
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="border border-slate-900 p-2">Assessor comments, if applicable:</td>
+                                                <td class="border border-slate-900 p-2 align-top">Assessor comments, if applicable:</td>
                                                 <td class="border border-slate-900 p-2">
                                                     <PcidssTextarea
                                                         :name="`assessorCommentsApplicable_5_3`"
@@ -1364,7 +1364,7 @@
                                         <tr class="border border-slate-900" v-for="row in JSON.parse(data?.form)?.tableBody">
                                             <!-- Title Show -->
                                             <td
-                                                class="px-2"
+                                                class="px-2 align-top"
                                                 :class="{
                                                     'font-bold  py-2': row?.colspan,
                                                 }"
@@ -1532,15 +1532,10 @@
                                         </tbody>
                                         <tfoot>
                                             <tr class="bg-teal text-white">
-                                                <td class="border border-slate-900 p-3 text-left" colspan="3" style="width: 50%">
+                                                <td class="border border-slate-900 p-3 text-left align-top" colspan="3" style="width: 50%">
                                                     <div class="text-dark" v-html="JSON.parse(data?.form)?.note?.title"></div>
                                                 </td>
                                                 <td class="border border-slate-900 p-1" colspan="3">
-                                                    <!-- <textarea
-                                                        rows="10"
-                                                        class="form-input text-lg"
-                                                        :name="JSON.parse(data?.form)?.note?.name"
-                                                    >{{ inputValues[JSON.parse(data?.form)?.note?.name] ?? defaultValues.placeholder }}</textarea> -->
                                                     <PcidssTextarea
                                                         :name="JSON.parse(data?.form)?.note?.name"
                                                         :inputValue = "inputValues[JSON.parse(data?.form)?.note?.name]"
@@ -1576,25 +1571,17 @@
                                         <tbody>
                                             <tr v-for="(tr, trIndex) in JSON.parse(data?.form).tableBody" :key="trIndex">
                                                 <td
-                                                    class="border border-slate-900 p-0 mb-0"
+                                                    class="border border-slate-900 p-0 mb-0 align-top"
                                                     v-for="(td, tdIndex) in tr.td"
                                                     :key="tdIndex"
                                                     :rowspan="tr?.rowspan && tdIndex == 0 ? tr?.rowspan : null"
                                                 >
-                                                    <!-- <input
-                                                        v-if="tdIndex === 'name'"
-                                                        type="text"
-                                                        class="form-input"
-                                                        :name="td"
-                                                        :value="inputValues[td] ?? defaultValues.placeholder"
-                                                        :placeholder="defaultValues.placeholder"
-                                                    /> -->
-                                                    <PcidssTextarea
-                                                        v-if="tdIndex === 'name'"
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="4"
-                                                    />
+                                                <PcidssTextarea
+                                                    v-if="tdIndex === 'name'"
+                                                    :name="td"
+                                                    :inputValue = "inputValues[td]"
+                                                    :rows="4"
+                                                />
                                                     <div v-else v-html="td" class="p-2"></div>
                                                 </td>
                                             </tr>
