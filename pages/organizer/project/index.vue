@@ -249,7 +249,7 @@ const getLastPage = computed(()=>{
 
     <div :class="[
         isOpen ? 'translate-x-0' : 'translate-x-full',
-        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
+        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out overflow-y-scroll',
     ]">
         <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
             <h2 class="text-2xl font-semibold">Project {{ isEdit.edit ? 'Edit & Update' : 'Create' }}</h2>

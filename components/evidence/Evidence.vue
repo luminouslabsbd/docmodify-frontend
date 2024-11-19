@@ -350,7 +350,13 @@ const getEvidenceById = async (id) => {
             <button @click="isShow = false" class="btn btn-sm btn-info">✕</button>
         </div>
         <div class="p-4">
-            <template v-if="evidence?.extension === 'pdf'">
+            <template v-if="evidence?.file === null">
+                <div class="flex flex-col items-center justify-center h-screen gap-3 text-center">
+                    <h1 class="font-semibold text-2xl">No Data Found</h1>
+                </div>
+            </template>
+            <template v-else>
+                <template v-if="evidence?.extension === 'pdf'">
                 <div class="w-full h-screen overflow-hidden">
                     <iframe class="w-full h-full" :src="evidence?.fileUrl"></iframe>
                 </div>
@@ -367,6 +373,8 @@ const getEvidenceById = async (id) => {
                     <iframe class="w-full h-full" :src="evidence?.fileUrl"></iframe>
                 </div>
             </template>
+            </template>
+
         </div>
     </div>
 </template>
