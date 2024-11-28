@@ -3,6 +3,8 @@
     import { useTokenStore } from '~/stores/useTokenStore';
     import { TransitionRoot, TransitionChild, Dialog, DialogPanel, DialogOverlay } from '@headlessui/vue';
     import SklitonLoader from '~/components/SklitonLoader.vue';
+    import { toast } from 'vue3-toastify';
+    import { useApiFetch } from '~/composables/useApiFetch';
 
     useHead({ title: 'Project' });
     definePageMeta({
@@ -12,10 +14,17 @@
     const page = ref(1);
     const perPage = ref(15);
     const query = ref('');
+    const isLoading = ref(false);
     const isDownloading = ref(null);
     const downloadModal = ref(false);
     const generateDownload = ref(false);
-    const projectId = ref(null)
+    const projectId = ref(null);
+    const isOpen = ref(false);
+    const form = ref({
+        sourceProject : '',
+        targetProject : '',
+    })
+
     const {
         data: projects,
         error,
@@ -94,11 +103,51 @@
         generateDownload.value = false;
         isDownloading.value = false;
     };
+
+    const submitProjectDuplicateForm = async() =>{
+        isLoading.value = true;
+
+
+        if(!form.value.sourceProject || !form.value.targetProject){
+            toast.error('Please select must SOURCE and TARGET project');
+            return;
+        }
+
+        if(form.value.sourceProject === form.value.targetProject){
+            toast.error('Please select deferent SOURCE and TARGET project');
+            return;
+        }
+
+
+
+        try {
+            const { data ,status} = await useApiFetch(`/user/duplicate-assessment`, {
+                method: 'POST',
+                body:form,
+            });
+
+
+            if (status.value === 'success') {
+                isLoading.value = false;
+                isOpen.value = false;
+                toast.success(data?.value?.message)
+            }
+
+        } catch (error) {
+            console.error('Docx Generate Error:', error);
+            isDownloading.value = null;
+        }
+    }
 </script>
 <template>
     <div class="panel">
         <div class="mb-5 flex items-center justify-between">
             <h5 class="text-lg font-semibold dark:text-white-light">Assignments</h5>
+            <div class="flex items-center">
+                <button class="btn btn-sm btn-info" @click="isOpen = true">
+                    Duplicate Assessment
+                </button>
+            </div>
         </div>
         <div class="mb-5">
             <div class="table-responsive">
@@ -205,5 +254,63 @@
                 </div>
             </Dialog>
         </TransitionRoot>
+    </div>
+
+
+    <div :class="[
+        isOpen ? 'translate-x-0' : 'translate-x-full',
+        'fixed right-0 top-0 z-50 h-full w-[550px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
+    ]">
+        <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
+            <h2 class="text-2xl font-semibold">Duplicate Assessment</h2>
+            <div class="flex gap-2">
+                <button @click="isOpen = false" class="btn btn-sm btn-info">✕</button>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <form @submit.prevent="submitProjectDuplicateForm()">
+                <div class="space-y-5">
+                    <h4>Select the project from which you would like to copy the assessment value. <small class="text-red-500">*</small></h4>
+                    <div class="max-h-[300px] overflow-hidden menu-scroll overflow-y-scroll">
+                        <div class="bg-gray-200 dark:bg-slate-800 p-2 rounded-sm mb-2" v-for="(project,key) in projects?.data" :key="key">
+                            <label class="flex items-center cursor-pointer p-0 m-0">
+                                <input
+                                    type="radio"
+                                    name="source_project"
+                                    class="form-radio border border-gray-500"
+                                    :value="project.id"
+                                    v-model="form.sourceProject"
+                                />
+                                <span class="text-white-dark">{{ project?.name }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <h4>Select the project where you want to paste the assessment value <small class="text-red-500">*</small></h4>
+                    <div class="max-h-[300px] overflow-hidden menu-scroll overflow-y-scroll">
+                        <div class="bg-gray-200 dark:bg-slate-800 p-2 rounded-sm mb-2" v-for="(project,key) in projects?.data" :key="key">
+                            <label class="flex items-center cursor-pointer p-0 m-0">
+                                <input
+                                    type="radio"
+                                    name="target_project"
+                                    class="form-radio border-gray-500"
+                                    :value="project.id"
+                                    v-model="form.targetProject"
+                                />
+                                <span class="text-white-dark">{{ project?.name }}</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-info" :disabled="isLoading">
+                            <ButtonLoader :isLoading="isLoading" />
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 </template>
