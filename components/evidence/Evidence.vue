@@ -18,6 +18,11 @@
         fetchEvidence:{
             type:Function,
             required:true,
+        },
+        otherProject:{
+            type:Boolean,
+            required:false,
+            default:false
         }
     })
 
@@ -247,7 +252,7 @@ const getEvidenceById = async (id) => {
                     <th class="border border-white-dark">{{ evidenceTitle?.purpose}}</th>
                     <th class="border border-white-dark">{{ evidenceTitle?.revisionDate?.title}}</th>
                     <th class="border border-white-dark">File Type</th>
-                    <th class="border border-white-dark text-right">Action</th>
+                    <th class="border border-white-dark text-right" v-if="!otherProject">Action</th>
                 </tr>
             </thead>
             <tbody v-if="evidences?.length">
@@ -261,7 +266,7 @@ const getEvidenceById = async (id) => {
                               :class="getExtensionColor(evidence?.extension)"
                             >{{ evidence?.extension }}</span>
                     </td>
-                    <td class="border border-white-dark text-right">
+                    <td class="border border-white-dark text-right" v-if="!otherProject">
                         <div class="flex gap-1">
                             <button @click="getEvidenceById(evidence?.id)" class="btn btn-info btn-sm">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">

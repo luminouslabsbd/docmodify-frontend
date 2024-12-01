@@ -118,8 +118,6 @@
             return;
         }
 
-
-
         try {
             const { data ,status} = await useApiFetch(`/user/duplicate-assessment`, {
                 method: 'POST',
