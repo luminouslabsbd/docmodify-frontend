@@ -111,12 +111,21 @@
         pciDssStatusRefresh();
     });
 
+    const cleanHtml = (input)=> {
+        if (!input || typeof input !== 'string' || input.trim() === '') {
+            return ''; // Return empty string if input is invalid
+        }
+
+        // Remove all tags except <i>, <strong>, <u> and their content
+        return input.replace(/<(?!\/?(i|b|em|strong|u)\b)[^>]+>/gi, '');
+    }
+
     const submitForm = async () => {
         isLoading.value = true;
         const formData = new FormData(event.target);
         const pciDss = {};
         formData.forEach((value, key) => {
-            pciDss[key] = value;
+            pciDss[key] = cleanHtml(value);
         });
 
         try {
@@ -439,6 +448,7 @@
                                     <!-- 3.3 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_3_3'">
                                         <table class="mt-5 table">
+                                           <tbody>
                                             <tr>
                                                  <td class="border border-slate-900 p-3 w-[50%] align-top">
                                                     Indicate whether the assessed entity uses one or more PCI SSC validated products or solutions.
@@ -471,10 +481,12 @@
                                                     If “Yes,” provide the following information regarding items the organization uses from PCI SSC's Lists of Validated Products and Solutions:
                                                 </td>
                                             </tr>
+                                           </tbody>
                                         </table>
 
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
                                                 <th class="border border-slate-900 p-3 font-semibold" >Name of PCI SSC validated product or solution</th>
                                                 <th class="border border-slate-900 p-3 font-semibold" >Version of product or solution</th>
                                                 <th class="border border-slate-900 p-3 font-semibold" >PCI SSC Standard to which product or solution was validated</th>
@@ -490,8 +502,10 @@
                                                     />
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
                                         <table class="mt-5 table">
+                                           <tbody>
                                             <tr>
                                                  <td class="border border-slate-900 p-3 w-[50%] align-top">
                                                     Provide the name of the assessor who attests that they have read the instruction manual associated with each of the software/solution(s) listed above and confirmed that the merchant has implemented the solution per the instructions and detail in the instruction manual.
@@ -516,6 +530,7 @@
                                                     />
                                                 </td>
                                             </tr>
+                                           </tbody>
                                         </table>
                                     </div>
                                     <!-- 4.1 Requirement Table -->
@@ -534,6 +549,7 @@
                                         <div class="">
                                             <p class="font-semibold my-5" >4.2.1 Description of Account Data Flows</p>
                                             <table class="table border">
+                                              <tbody>
                                                 <tr>
                                                     <td class="p-2" colspan="2">
                                                         <p>Identify in which of the following account data flows the assessed entity participates:</p>
@@ -568,8 +584,10 @@
                                                         </p>
                                                     </td>
                                                 </tr>
+                                              </tbody>
                                             </table>
                                             <table class="table border border-slate-900">
+                                              <tbody>
                                                 <tr>
                                                     <td class="p-2 font-semibold text-white" style="text-align: center; background-color: teal; width: 35%">
                                                         Account data flows (For example, account data flow 1, account data flow 2)
@@ -595,6 +613,7 @@
                                                         />
                                                     </td>
                                                 </tr>
+                                              </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -646,7 +665,8 @@
                                         <div class="mt-3">
                                             <h3 class="text-lg font-semibold">4.3.1 Storage of SAD</h3>
                                             <table class="table-bordered table border-secondary">
-                                                <tr>
+                                                <tbody>
+                                                    <tr>
                                                     <td class="border border-slate-900 p-2" colspan="2">
                                                         <p>If SAD is stored complete the following:</p>
                                                         <li>Note: Anywhere SAD is stored should be documented in the table in 4.3</li>
@@ -712,6 +732,7 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -719,6 +740,7 @@
                                     <!-- 4.4 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_4'">
                                         <table class="table-bordered table border-secondary">
+                                           <tbody>
                                             <tr style="background-color: teal; color: white">
                                                 <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">Company Name</th>
                                                 <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">
@@ -784,6 +806,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                           </tbody>
                                         </table>
 
                                         <ul class="mt-3">
@@ -797,7 +820,8 @@
                                         <div v-for="(table) in JSON.parse(data?.form)?.tableBody">
                                             <p class="font-semibold my-5" v-html="table?.title" />
                                             <table class="mt-3">
-                                                <tr class="border border-slate-900 text-center" style="background-color: teal; color: white">
+                                                <tbody>
+                                                    <tr class="border border-slate-900 text-center" style="background-color: teal; color: white">
                                                     <th class="p-2 w-[33%]">Network Name (In scope)</th>
                                                     <th class="p-2">Type of Network</th>
                                                     <th class="p-2 w-[33%]">Function/ Purpose of Network</th>
@@ -811,6 +835,7 @@
                                                         />
                                                     </td>
                                                 </tr>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -927,7 +952,8 @@
                                         </table>
 
                                         <table class="table-bordered mt-5 table border-secondary">
-                                            <tr>
+                                            <tbody>
+                                                <tr>
                                                 <td class="border border-slate-900 p-2 align-top" style="width: 50%">
                                                     Indicate whether this is the assessed entity’s initial PCI DSS assessment against the ASV scan requirements.
                                                 </td>
@@ -977,13 +1003,15 @@
                                                     />
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 5.2 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_2'">
                                         <table class="table">
-                                            <tr>
+                                            <tbody>
+                                                <tr>
                                                 <td class="border border-slate-900 p-2" style="width: 50%">
                                                     Indicate whether the ASV and the assessed entity completed the Attestations of Scan Compliance, confirming
                                                     that all externally accessible (Internet-facing) IP addresses in existence at the entity were appropriately
@@ -1012,13 +1040,15 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 5.3 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_3'">
                                         <table class="table-bordered table border-secondary">
-                                            <tr style="background-color: teal; color: white">
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
                                                 <th class="border border-slate-900 p-2 w-[29%]" rowspan="2">Date of the Scan(s)</th>
                                                 <th class="border border-slate-900 p-2 w-[10%]" colspan="2">Was the scan performed via authenticated scanning?</th>
                                                 <th class="border border-slate-900 p-2 w-[10%]" colspan="2">
@@ -1053,6 +1083,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
 
                                         <table class="mt-5 table">
@@ -1251,7 +1282,8 @@
                                             </tr>
                                         </table>
                                         <table class="table-bordered mt-5 table border-dark">
-                                            <tr>
+                                            <tbody>
+                                                <tr>
                                                 <td class="border border-slate-900 p-3" colspan="3">
                                                     Describe the testing procedures derived and performed by the assessor to validate that the implemented
                                                     controls meet the Customized Approach Objective; for example, whether the customized control(s) is
@@ -1355,6 +1387,7 @@
                                                     />
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>

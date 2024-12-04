@@ -26,8 +26,10 @@
         "vue-tsc": "^0.40.4"
     },
     "dependencies": {
+        "@ckeditor/ckeditor5-vue": "^7.3.0",
+        "ckeditor5": "^43.3.1",
         "@headlessui/vue": "^1.7.23",
-        "@pinia/nuxt": "^0.4.11",
+        "@pinia/nuxt": "^0.5.0",
         "@suadelabs/vue3-multiselect": "^1.0.2",
         "pinia": "^2.2.5",
         "pinia-plugin-persistedstate": "^4.1.2",

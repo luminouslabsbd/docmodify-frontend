@@ -45,7 +45,7 @@ export default defineNuxtConfig({
             baseUrl: process.env.API_URL || '',
         }
     },
-    plugins: ['~/plugins/vue-multiselect.js'],
+    plugins: ['~/plugins/vue-multiselect.js', '~/plugins/ck-editor.client.ts'],
 
     i18n: {
         locales: [
@@ -77,4 +77,5 @@ export default defineNuxtConfig({
     router: {
         options: { linkExactActiveClass: 'active' },
     },
+    ssr: false,
 });

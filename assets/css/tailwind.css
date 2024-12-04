@@ -705,3 +705,12 @@
         @apply text-base font-semibold; /* Make sure to add padding and border here */
     }
 }
+
+
+.ck-editor__editable p{
+    font-weight: normal !important;
+}
+
+.ck .ck-powered-by{
+    display: none;
+}
