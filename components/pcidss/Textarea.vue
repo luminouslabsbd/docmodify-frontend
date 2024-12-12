@@ -1,64 +1,3 @@
-<!-- <script setup>
-    import { ref, onMounted, watch } from 'vue';
-
-    const props = defineProps({
-        name: {
-            type: String,
-            required: true,
-        },
-        inputValue: {
-            type: String,
-            required: false,
-        },
-        rows: {
-            type: Number,
-            default: 4,
-        },
-    });
-
-    const placeholder = ref(`   `);
-    const textareaRef = ref(null);
-
-    const adjustHeight = () => {
-        const textarea = textareaRef.value;
-        if (textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = `${textarea.scrollHeight}px`;
-        }
-    };
-
-    onMounted(() => {
-        adjustHeight();
-    });
-
-    watch(() => props.inputValue, adjustHeight);
-
-
-    const changeInput = (value) => {
-
-        console.log("changeInput", value)
-
-        textareaRef.value.value = value
-        console.log("text ref", textareaRef.value.value)
-    }
-
-</script>
-
-<template>
-    <div>
-
-    <Editor @input="changeInput" :initVal="inputValue"/>
-    <textarea
-        ref="textareaRef"
-        :name="name"
-        :placeholder="placeholder"
-        class="form-input rounded-none p-2 font-medium focus:border-gray-200 display-none"
-        :rows="rows"
-        @input="adjustHeight"
-        style="overflow: hidden"
-        >{{ inputValue ?? placeholder }}</textarea>
-    </div>
-</template> -->
 <script setup>
     import { computed, ref, onMounted, watch, defineEmits } from 'vue';
     import { Ckeditor } from '@ckeditor/ckeditor5-vue';
@@ -150,6 +89,7 @@
 
 <template>
     <ckeditor
+        :style="{minHeight:rows + 'rem'}"
         v-if="editor && config"
         :modelValue="localValue"
         @update:modelValue="handleChange"
@@ -158,4 +98,3 @@
     />
     <input type="hidden" :name="name" :value="localValue" />
 </template>
-

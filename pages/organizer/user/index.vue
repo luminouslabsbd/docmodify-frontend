@@ -335,14 +335,14 @@ const submitPassForm = async () =>{
                         <p v-if="errors?.password" class="text-red-500">{{ errors?.password[0] }}</p>
                     </div>
 
-                    <div v-if="!(isEdit.edit)">
+                    <!-- <div v-if="!(isEdit.edit)">
                         <label for="projects">Select Project<small class="text-red-500">*</small></label>
                         <select name="projects" id="projects" class="form-input" v-model="form.projects">
                             <option value="" selected disabled >Select one project</option>
                             <option :value="project.id" v-for="(project, key) in userProjects?.data" :key="key"> {{ project.name  }} </option>
                         </select>
                         <p v-if="errors?.projects" class="text-red-500">{{ errors?.projects[0] }}</p>
-                    </div>
+                    </div> -->
                     <div>
                         <button type="submit" :disabled="isLoading" class="btn btn-info">
                             <ButtonLoader :isLoading="isLoading" />

@@ -12,7 +12,7 @@
         middleware: ['auth'],
     });
 
-    useHead({ title: 'Others Assessment' });
+    useHead({ title: 'Assessment' });
 
     const defaultValues = ref({
         descriptionTitle: 'Requirement Description',
@@ -24,14 +24,65 @@
         notChecked: '☐',
     });
 
-    const selectedTab = ref(tabs.DOCUMENT);
+    const currentTab = ref('document');
+    const evidence = ref({})
+    const errors = ref({});
+    const isShow = ref(false)
+    const isEdit = ref({
+        edit: false,
+        id: null,
+    });
     const isLoading = ref(false);
     const route = useRoute();
     const inputValues = ref({});
     const isOpen = ref(false);
+    const isOpenEdit = ref(false);
     const evidences = ref([]);
     const requirementId = ref(1);
     const formEvidences = ref([]);
+    const evidenceTitle = ref({
+        number:'Reference Number',
+        name:{
+            title:'',
+            subTitle:''
+        },
+        purpose:'',
+        revisionDate:{
+            title:'',
+            subTitle:'',
+        }
+    })
+
+    const title = computed(() => {
+        switch (currentTab.value) {
+            case tabs.DOCUMENT:
+                evidenceTitle.value.name.title = "Document Name";
+                evidenceTitle.value.name.subTitle = "(including version, if applicable)";
+                evidenceTitle.value.purpose = "Document Purpose";
+                evidenceTitle.value.revisionDate.title = "Document Revision Date";
+                evidenceTitle.value.revisionDate.subTitle = "(if applicable)";
+                return "Documentation Evidence";
+
+            case tabs.INTERVIEW:
+            evidenceTitle.value.name.title = "Title of Workpaper with Interview Notes";
+                evidenceTitle.value.purpose = "Topics Covered";
+                evidenceTitle.value.revisionDate.title = "Role(s) of Interviewee(s)";
+                return "Interview Evidence";
+
+            case tabs.ASSESSMENT:
+                evidenceTitle.value.name.title = "Title of Workpaper or Evidence";
+                evidenceTitle.value.purpose = "Topics Covered or Evidence Collected";
+                evidenceTitle.value.revisionDate.title = "Sample Set Reference Number from Table 6.3";
+                evidenceTitle.value.revisionDate.subTitle = "(if applicable)";
+                return "Assessment Evidence";
+
+            default:
+            return "Unknown Evidence";
+        }
+    });
+
+
+
     const { data: menus, refresh: menuRefresh } = useAsyncData(
         'user_menus',
         () =>
@@ -55,7 +106,7 @@
             method: 'POST',
             immediate: true,
             body: {
-                projectId: route.params.project_id,
+                projectId: route.params.id,
             },
         },
     );
@@ -87,7 +138,6 @@
             watch: [requirementId],
         }
     );
-
     watch(
         data,
         (newData) => {
@@ -112,12 +162,21 @@
         pciDssStatusRefresh();
     });
 
+    const cleanHtml = (input) => {
+        if (!input || typeof input !== 'string' || input.trim() === '') {
+            return '';
+        }
+        input = input.replace(/\n/g, '%%NEWLINE%%');
+        input = input.replace(/<(?!\/?(i|b|em|strong|u)\b)[^>]+>/gi, '');
+        return input.replace(/%%NEWLINE%%/g, '\n');
+    }
+
     const submitForm = async () => {
         isLoading.value = true;
         const formData = new FormData(event.target);
         const pciDss = {};
         formData.forEach((value, key) => {
-            pciDss[key] = value;
+            pciDss[key] = cleanHtml(value);
         });
 
         try {
@@ -141,23 +200,32 @@
         }
     };
 
-    const changeTab = async (tab) => {
-        selectedTab.value = tab;
-        await fetchEvidence();
-    };
+    // const changeTab = async (tab) => {
+    //     alert(tab);
+    //     selectedTab.value = tab;
+    //     alert('selectedTab.value',JSON.stringify(selectedTab.value))
+    //     await fetchEvidence();
+    // };
 
-    const fetchEvidence = async () => {
-        const { data, error, status } = await useApiFetch(`/user/evidence/${selectedTab.value}/${route.params.id}`, {
+    const fetchEvidence = async (tab) => {
+        currentTab.value = tab;
+        const { data, error, status } = await useApiFetch(`/user/others-user-evidence/${tab}`, {
             method: 'GET',
+            params:{
+                projectId: route.params.project_id,
+                userId: route.params.user_id,
+
+            }
         });
+
         if (status.value === 'success') {
             evidences.value = data.value?.data;
             isOpen.value = true;
         }
 
-        if (status.value === 'error') {
-            console.log('Error ', error);
-        }
+        // if (status.value === 'error') {
+        //     console.log('Error ', error);
+        // }
     };
 
     // menu active and de-active system using by key
@@ -192,25 +260,185 @@
             return "bg-gray-200"
         }
     }
+  }
 
-
+  const getRows = (name)=>{
+    switch (name) {
+      case 'qa_reviewer_pci_credentials_3_6':
+      case 'remote_testing_reason':
+      case 'conflict_of_interest_description_1_4':
+      case 'roc_consecutive_years_1_6':
+      case 'excluded_scope_description_3_1':
+      case 'saq_eligibility_description_3_1':
+      case 'ifNoProvideAssessment_3_2':
+      case 'anyAdditionalCommentsOrFindings_3_3':
+      case 'evidence_repositories_description_6_1':
+      case 'samplingRationaleUsed_6_2':
+        return 5;
+      case 'date_report_note':
+      case 'entity_security_impact_services_2_1':
+      case 'assessor_scope_difference_3_1':
+      case 'scope_limiting_factors_3_1':
+      case 'proceduresRequiringScanning_5_1':
+      case 'documentedPoliciesProcedures_5_3':
+        return 7;
+      case 'products_services_disclosure_1_4':
+      case 'entity_business_description_2_1':
+      case 'technologiesProcessesUsedImplement_3_2':
+      case 'assessorWhoAttestsInstruction_3_3':
+      case 'assessor_attestation_6_1' :
+        return 8;
+      default:
+        return 1
+    }
   }
 
 
+   function getExtensionColor(extension) {
+        switch (extension) {
+            case 'pdf':
+                return 'bg-green-500';
+            case 'docx':
+                return 'bg-blue-500';
+            case 'jpg':
+                return 'bg-violet-500'
+            case 'jpeg':
+                return 'bg-orange-500'
+            case 'png':
+                return 'bg-yellow-500';
+            case 'mp4':
+                return 'bg-rose-500';
+            default:
+                return 'bg-gray-500';
+    }
+   }
+
+
+    const showEvidence = async (id) =>{
+        try {
+            const { data, error, pending, status } = await useApiFetch(`/user/show-evidence/${id}`);
+
+            if (status.value === 'error') {
+                errors.value = error.value?.data?.errors;
+            }
+            if (status.value === 'success') {
+               evidence.value = data.value?.data;
+               isShow.value = true;
+            }
+        } catch (error) {
+            toast.error('Something want wrong!')
+        }
+    }
+
+    const getEvidenceById = async (id) => {
+        const { data, error, status } = await useApiFetch(`/user/show-evidence/${id}`, {
+            method: 'GET',
+
+        });
+
+        if (status.value === 'error') {
+            toast.error("Something want wrong!");
+        }
+
+        if (status.value === 'success') {
+            editForm.value = data.value.data
+            console.log("🚀 ~ getEvidenceById ~ editForm:", editForm.value)
+            isEdit.value.edit = true;
+            isEdit.value.id = id;
+            isOpenEdit.value = true;
+        }
+    }
+
+    const form = ref({
+        number: {
+            key:'referenceNumber_6_4_',
+            value:''
+        },
+        name:{
+            key:'documentName_6_4_',
+            value:''
+        },
+        purpose:{
+            key:'documentPurpose_6_4_',
+            value:''
+        },
+        revision_date:{
+            key:'documentRevisionDate_6_4_',
+            value:''
+        },
+        file:null,
+        type:currentTab.value
+    });
+    const editForm = ref({})
+
+    const resetForm = () => {
+        form.value = {
+            reference_number_value: '',
+            document_name_value: '',
+            document_purpose_value:'',
+            document_revision_date_value:'',
+            file:null,
+            type:tab
+        };
+        errors.value = {};
+    };
+
+    const uploadFile = (event) => {
+        const target = event.target;
+        if (target.files?.[0]) {
+            editForm.value.file = target.files[0];
+        }
+    }
+    const submitEditForm = async() =>{
+        isLoading.value = true;
+        const formData = new FormData();
+
+        formData.append('id',editForm.value.id);
+        formData.append('number',editForm.value.reference_number_value);
+        formData.append('name',editForm.value.document_name_value);
+        formData.append('purpose',editForm.value.document_purpose_value);
+        formData.append('revision',editForm.value.document_revision_date_value);
+        formData.append('file',editForm.value.file);
+        formData.append('type',currentTab.value);
+
+        errors.value = {};
+        try {
+            const { data, error, pending, status } = await useApiFetch(`/user/evidence`, {
+                method:"POST",
+                body: formData,
+            });
+
+
+            if (status.value === 'error') {
+                isLoading.value = false;
+                errors.value = error.value?.data?.errors;
+            }
+            if (status.value === 'success') {
+                await fetchEvidence(currentTab.value);
+                editForm.value = {};
+                isOpenEdit.value = false;
+                isLoading.value = false;
+                toast.success(data.value?.message)
+            }
+        } catch (error) {
+            toast.error('Something want wrong!')
+            isLoading.value = false;
+        }
+    }
 
 </script>
 <template>
     <div class="panel font-arial">
         <div
-            class="sticky top-[58px] mb-5 flex items-center justify-between border-b border-gray-100 bg-white px-3 py-3 backdrop:blur-md dark:border-slate-800 dark:bg-black-dark-light dark:text-dark-light"
+            class="sticky top-[55px] mb-5 flex items-center justify-between border-b border-gray-100 bg-white px-3 py-3 backdrop:blur-md dark:border-slate-800 dark:bg-black-dark-light dark:text-dark-light"
         >
             <h5 class="text-lg font-semibold dark:text-white-light">Assignment - PCI DSS v4.0.1 Report on Compliance</h5>
-            <!-- <button @click="fetchEvidence()" type="button" class="btn btn-info btn-sm">
+            <button @click="fetchEvidence('document')" type="button" class="btn btn-info btn-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
                 <span class="ml-2">Reference</span>
-            </button> -->
+            </button>
         </div>
         <div class="flex justify-between">
             <div class="w-3/12 p-4">
@@ -440,6 +668,7 @@
                                     <!-- 3.3 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_3_3'">
                                         <table class="mt-5 table">
+                                           <tbody>
                                             <tr>
                                                  <td class="border border-slate-900 p-3 w-[50%] align-top">
                                                     Indicate whether the assessed entity uses one or more PCI SSC validated products or solutions.
@@ -472,10 +701,12 @@
                                                     If “Yes,” provide the following information regarding items the organization uses from PCI SSC's Lists of Validated Products and Solutions:
                                                 </td>
                                             </tr>
+                                           </tbody>
                                         </table>
 
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
                                                 <th class="border border-slate-900 p-3 font-semibold" >Name of PCI SSC validated product or solution</th>
                                                 <th class="border border-slate-900 p-3 font-semibold" >Version of product or solution</th>
                                                 <th class="border border-slate-900 p-3 font-semibold" >PCI SSC Standard to which product or solution was validated</th>
@@ -483,7 +714,7 @@
                                                 <th class="border border-slate-900 p-3 font-semibold" >Expiry date of listing</th>
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody_3_2">
-                                                <td class="border border-slate-900 p-3" v-for="td in row?.names">
+                                                <td class="border border-slate-900 p-0" v-for="td in row?.names">
                                                     <PcidssTextarea
                                                         :name="td"
                                                         :inputValue = "inputValues[td]"
@@ -491,32 +722,35 @@
                                                     />
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
                                         <table class="mt-5 table">
+                                           <tbody>
                                             <tr>
-                                                 <td class="border border-slate-900 p-3 w-[50%] align-top">
+                                                 <td class="border border-slate-900 w-[50%] align-top">
                                                     Provide the name of the assessor who attests that they have read the instruction manual associated with each of the software/solution(s) listed above and confirmed that the merchant has implemented the solution per the instructions and detail in the instruction manual.
                                                  </td>
-                                                 <td class="border border-slate-900 p-3">
+                                                 <td class="border border-slate-900 p-0">
                                                     <PcidssTextarea
                                                         :name="`assessorWhoAttestsInstruction_3_3`"
                                                         :inputValue = "inputValues[`assessorWhoAttestsInstruction_3_3`]"
-                                                        :rows="1"
+                                                        :rows="getRows(`assessorWhoAttestsInstruction_3_3`)"
                                                     />
                                                 </td>
                                             </tr>
                                             <tr>
-                                                 <td class="border border-slate-900 p-3 align-top">
+                                                 <td class="border border-slate-900 align-top">
                                                     Any additional comments or findings the assessor would like to include, if applicable.
                                                  </td>
-                                                 <td class="border border-slate-900 p-3">
+                                                 <td class="border border-slate-900 p-0">
                                                     <PcidssTextarea
                                                         :name="`anyAdditionalCommentsOrFindings_3_3`"
                                                         :inputValue = "inputValues[`anyAdditionalCommentsOrFindings_3_3`]"
-                                                        :rows="1"
+                                                        :rows="getRows(`anyAdditionalCommentsOrFindings_3_3`)"
                                                     />
                                                 </td>
                                             </tr>
+                                           </tbody>
                                         </table>
                                     </div>
                                     <!-- 4.1 Requirement Table -->
@@ -535,6 +769,7 @@
                                         <div class="">
                                             <p class="font-semibold my-5" >4.2.1 Description of Account Data Flows</p>
                                             <table class="table border">
+                                              <tbody>
                                                 <tr>
                                                     <td class="p-2" colspan="2">
                                                         <p>Identify in which of the following account data flows the assessed entity participates:</p>
@@ -569,8 +804,10 @@
                                                         </p>
                                                     </td>
                                                 </tr>
+                                              </tbody>
                                             </table>
                                             <table class="table border border-slate-900">
+                                              <tbody>
                                                 <tr>
                                                     <td class="p-2 font-semibold text-white" style="text-align: center; background-color: teal; width: 35%">
                                                         Account data flows (For example, account data flow 1, account data flow 2)
@@ -581,14 +818,14 @@
                                                     </td>
                                                 </tr>
                                                 <tr v-for="item in 2">
-                                                    <td class="border border-slate-900 p-3 align-top">
+                                                    <td class="border border-slate-900 p-0 align-top">
                                                         <PcidssTextarea
                                                             :name="`accountDataFlows_4_2_${item}`"
                                                             :inputValue = "inputValues[`accountDataFlows_4_2_${item}`]"
                                                             :rows="1"
                                                         />
                                                     </td>
-                                                    <td class="border border-slate-900 p-3 align-top">
+                                                    <td class="border border-slate-900 p-0 align-top">
                                                         <PcidssTextarea
                                                             :name="`descriptionInclude_4_2_${item}`"
                                                             :inputValue = "inputValues[`descriptionInclude_4_2_${item}`]"
@@ -596,6 +833,7 @@
                                                         />
                                                     </td>
                                                 </tr>
+                                              </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -624,7 +862,7 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                    <td class="border border-slate-900 w-[20%]" v-for="name in row?.names">
+                                                    <td class="border border-slate-900 w-[20%] p-0" v-for="name in row?.names">
                                                         <PcidssTextarea
                                                             :name="name"
                                                             :inputValue = "inputValues[name]"
@@ -647,7 +885,8 @@
                                         <div class="mt-3">
                                             <h3 class="text-lg font-semibold">4.3.1 Storage of SAD</h3>
                                             <table class="table-bordered table border-secondary">
-                                                <tr>
+                                                <tbody>
+                                                    <tr>
                                                     <td class="border border-slate-900 p-2" colspan="2">
                                                         <p>If SAD is stored complete the following:</p>
                                                         <li>Note: Anywhere SAD is stored should be documented in the table in 4.3</li>
@@ -713,6 +952,7 @@
                                                         </div>
                                                     </td>
                                                 </tr>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -720,6 +960,7 @@
                                     <!-- 4.4 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_4'">
                                         <table class="table-bordered table border-secondary">
+                                           <tbody>
                                             <tr style="background-color: teal; color: white">
                                                 <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">Company Name</th>
                                                 <th class="border border-slate-900 p-3 text-center w-[15%]" rowspan="2">
@@ -749,7 +990,7 @@
                                                 <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
                                             </tr>
                                             <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td style="text-align:center;" class="border border-slate-900 p-1" v-for="(td, key) in row?.names">
+                                                <td style="text-align:center;" class="border border-slate-900 p-0" v-for="(td, key) in row?.names">
                                                     <div v-if="key === 3 || key === 4 || key === 7 || key === 8">
                                                         <div v-if="key === 3">
                                                             <PcidssCheckbox
@@ -785,6 +1026,7 @@
                                                     </div>
                                                 </td>
                                             </tr>
+                                           </tbody>
                                         </table>
 
                                         <ul class="mt-3">
@@ -798,13 +1040,14 @@
                                         <div v-for="(table) in JSON.parse(data?.form)?.tableBody">
                                             <p class="font-semibold my-5" v-html="table?.title" />
                                             <table class="mt-3">
-                                                <tr class="border border-slate-900 text-center" style="background-color: teal; color: white">
+                                                <tbody>
+                                                    <tr class="border border-slate-900 text-center" style="background-color: teal; color: white">
                                                     <th class="p-2 w-[33%]">Network Name (In scope)</th>
                                                     <th class="p-2">Type of Network</th>
                                                     <th class="p-2 w-[33%]">Function/ Purpose of Network</th>
                                                 </tr>
                                                 <tr v-for="row in table?.names">
-                                                    <td class="border border-slate-900 p-2" v-for="td in row?.names">
+                                                    <td class="border border-slate-900 p-0" v-for="td in row?.names">
                                                         <PcidssTextarea
                                                             :name="td"
                                                             :inputValue = "inputValues[td]"
@@ -812,6 +1055,7 @@
                                                         />
                                                     </td>
                                                 </tr>
+                                                </tbody>
                                             </table>
                                         </div>
                                     </div>
@@ -819,46 +1063,50 @@
                                     <!-- 4.6 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_6'">
                                         <table class="mt-3">
-                                            <tr class="text-center" style="background-color: teal; color: white ;text-align: center;">
-                                                <th class="border border-slate-900 p-2 text-center w-[33%]">
-                                                    Facility Type (Datacenters, corporate office, call center, mail processing facility, etc.)
-                                                </th>
-                                                <th class="border border-slate-900 p-2 text-center">
-                                                    Total Number of Locations (How many locations of this type are in scope)
-                                                </th>
-                                                <th class="border border-slate-900 p-2 text-center w-[33%]">Location(s) of Facility (for example, city, country)</th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-2" v-for="td in row?.names">
-                                                    <PcidssTextarea
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr class="text-center" style="background-color: teal; color: white ;text-align: center;">
+                                                    <th class="border border-slate-900 p-2 text-center w-[33%]">
+                                                        Facility Type (Datacenters, corporate office, call center, mail processing facility, etc.)
+                                                    </th>
+                                                    <th class="border border-slate-900 p-2 text-center">
+                                                        Total Number of Locations (How many locations of this type are in scope)
+                                                    </th>
+                                                    <th class="border border-slate-900 p-2 text-center w-[33%]">Location(s) of Facility (for example, city, country)</th>
+                                                </tr>
+                                                <tr v-for="row in JSON.parse(data?.form)?.tableBody">
+                                                    <td class="border border-slate-900 p-0" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 4.7 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_4_7'">
                                         <table class="mt-3">
-                                            <tr class="text-center" style="background-color: teal; color: white">
-                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Type of System Component <sup>1</sup></th>
-                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Total Number of System Components <sup>2</sup></th>
-                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Vendor</th>
-                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Product Name and Version</th>
-                                                <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Role/Function Description</th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-2" v-for="td in row?.names">
-                                                    <PcidssTextarea
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr class="text-center" style="background-color: teal; color: white">
+                                                    <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Type of System Component <sup>1</sup></th>
+                                                    <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Total Number of System Components <sup>2</sup></th>
+                                                    <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Vendor</th>
+                                                    <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Product Name and Version</th>
+                                                    <th class="w-[20%] border border-slate-900 p-3 text-center font-semibold">Role/Function Description</th>
+                                                </tr>
+                                                <tr v-for="row in JSON.parse(data?.form)?.tableBody">
+                                                    <td class="border border-slate-900 p-0" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                         <div class="mt-5">
                                             <p>1	For example, application, firewall, server, IDS, Anti-malware software, database, and so on.</p>
@@ -868,158 +1116,104 @@
 
                                     <!-- 5.1 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_1'">
-                                        <table class="table-bordered table border-secondary">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-2 text-center text-white w-[15%]" rowspan="2">Date of the Scan(s)</th>
-                                                <th class="border border-slate-900 p-2 text-center text-white w-[15%]" rowspan="2">
-                                                    Name of ASV that Performed the Scan
-                                                </th>
-                                                <th class="border border-slate-900 p-2 text-center text-white w0-[10%]" colspan="2">
-                                                    Were any vulnerabilities found that resulted in a failed initial scan?
-                                                </th>
-                                                <th class="border border-slate-900 p-2 text-center text-white w-[60%]" rowspan="2">
-                                                    For all scans resulting in a Fail, provide date(s) of re-scans showing that the vulnerabilities have been
-                                                    corrected
-                                                </th>
-                                            </tr>
-                                            <tr style="background-color: #e1e1e1;text-align: center;">
-                                                <td class="border border-slate-900 p-2 text-center">Yes</td>
-                                                <td class="border border-slate-900 p-2 text-center">No</td>
-                                            </tr>
-                                            <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-2" style="text-align: center;">
-                                                    <PcidssTextarea
-                                                        :name="row?.names[0]"
-                                                        :inputValue = "inputValues[row?.names[0]]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-
-                                                <td class="border border-slate-900 p-2">
-                                                    <PcidssTextarea
-                                                        :name="row?.names[1]"
-                                                        :inputValue = "inputValues[row?.names[1]]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-
-                                                <td class="border border-slate-900 p-2" style="text-align: center;">
-                                                    <PcidssCheckbox
-                                                        :name="row?.names[2]"
-                                                        :inputValue="inputValues[row?.names[2]]"
-                                                    />
-                                                </td>
-
-                                                <td class="border border-slate-900 p-2" style="text-align: center;">
-                                                    <PcidssCheckbox
-                                                        :name="row?.names[3]"
-                                                        :inputValue="inputValues[row?.names[3]]"
-                                                    />
-                                                </td>
-
-                                                <td class="border border-slate-900 p-2">
-                                                    <PcidssTextarea
-                                                        :name="row?.names[4]"
-                                                        :inputValue = "inputValues[row?.names[4]]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
-                                        </table>
-
                                         <table class="table-bordered mt-5 table border-secondary">
-                                            <tr>
-                                                <td class="border border-slate-900 p-2 align-top" style="width: 50%">
-                                                    Indicate whether this is the assessed entity’s initial PCI DSS assessment against the ASV scan requirements.
-                                                </td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <div class="flex items-center gap-4">
-                                                        <div class="flex items-center space-x-4">
-                                                            <label class="flex items-center space-x-1">
-                                                                <PcidssCheckbox
-                                                                    :name="`assessedEntityInitialPciDssAssessment_5_1_yes`"
-                                                                    :inputValue="inputValues[`assessedEntityInitialPciDssAssessment_5_1_yes`]"
-                                                                />
-                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
-                                                            </label>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2 align-top" style="width: 50%">
+                                                        Indicate whether this is the assessed entity’s initial PCI DSS assessment against the ASV scan requirements.
+                                                    </td>
+                                                    <td class="border border-slate-900">
+                                                        <div class="flex items-center gap-4">
+                                                            <div class="flex items-center space-x-4">
+                                                                <label class="flex items-center space-x-1">
+                                                                    <PcidssCheckbox
+                                                                        :name="`assessedEntityInitialPciDssAssessment_5_1_yes`"
+                                                                        :inputValue="inputValues[`assessedEntityInitialPciDssAssessment_5_1_yes`]"
+                                                                    />
+                                                                    <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                                </label>
+                                                            </div>
+                                                            <div class="flex items-center space-x-4">
+                                                                <label class="flex items-center space-x-1">
+                                                                    <PcidssCheckbox
+                                                                        :name="`assessedEntityInitialPciDssAssessment_5_1_no`"
+                                                                        :inputValue="inputValues[`assessedEntityInitialPciDssAssessment_5_1_no`]"
+                                                                    />
+                                                                    <span class="text-gray-700 cursor-pointer">No</span>
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                        <div class="flex items-center space-x-4">
-                                                            <label class="flex items-center space-x-1">
-                                                                <PcidssCheckbox
-                                                                    :name="`assessedEntityInitialPciDssAssessment_5_1_no`"
-                                                                    :inputValue="inputValues[`assessedEntityInitialPciDssAssessment_5_1_no`]"
-                                                                />
-                                                                <span class="text-gray-700 cursor-pointer">No</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border border-slate-900 p-2 align-top">
-                                                    If yes, Identify the name of the document the assessor verified to include the entity’s documented policies
-                                                    and procedures requiring scanning at least once every three months going forward.
-                                                </td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <PcidssTextarea
-                                                        :name="`proceduresRequiringScanning_5_1`"
-                                                        :inputValue = "inputValues[`proceduresRequiringScanning_5_1`]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border border-slate-900 p-2 align-top">Assessor comments, if applicable:</td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <PcidssTextarea
-                                                        :name="`assessorCommentsApplicable_5_1`"
-                                                        :inputValue = "inputValues[`assessorCommentsApplicable_5_1`]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2 align-top">
+                                                        If yes, Identify the name of the document the assessor verified to include the entity’s documented policies
+                                                        and procedures requiring scanning at least once every three months going forward.
+                                                    </td>
+                                                    <td class="border border-slate-900 p-0">
+                                                        <PcidssTextarea
+                                                            :name="`proceduresRequiringScanning_5_1`"
+                                                            :inputValue = "inputValues[`proceduresRequiringScanning_5_1`]"
+                                                            :rows="getRows('proceduresRequiringScanning_5_1')"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2 align-top">Assessor comments, if applicable:</td>
+                                                    <td class="border border-slate-900 p-0">
+                                                        <PcidssTextarea
+                                                            :name="`assessorCommentsApplicable_5_1`"
+                                                            :inputValue = "inputValues[`assessorCommentsApplicable_5_1`]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 5.2 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_2'">
                                         <table class="table">
-                                            <tr>
-                                                <td class="border border-slate-900 p-2" style="width: 50%">
-                                                    Indicate whether the ASV and the assessed entity completed the Attestations of Scan Compliance, confirming
-                                                    that all externally accessible (Internet-facing) IP addresses in existence at the entity were appropriately
-                                                    scoped for the ASV scans.
-                                                </td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <div class="flex items-center gap-4">
-                                                        <div class="flex items-center space-x-4">
-                                                            <label class="flex items-center space-x-1">
-                                                                <PcidssCheckbox
-                                                                    :name="`attestationsScanComplianceConfirming_5_2_yes`"
-                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_2_yes`]"
-                                                                />
-                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
-                                                            </label>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2" style="width: 50%">
+                                                        Indicate whether the ASV and the assessed entity completed the Attestations of Scan Compliance, confirming
+                                                        that all externally accessible (Internet-facing) IP addresses in existence at the entity were appropriately
+                                                        scoped for the ASV scans.
+                                                    </td>
+                                                    <td class="border border-slate-900 p-2">
+                                                        <div class="flex items-center gap-4">
+                                                            <div class="flex items-center space-x-4">
+                                                                <label class="flex items-center space-x-1">
+                                                                    <PcidssCheckbox
+                                                                        :name="`attestationsScanComplianceConfirming_5_2_yes`"
+                                                                        :inputValue="inputValues[`attestationsScanComplianceConfirming_5_2_yes`]"
+                                                                    />
+                                                                    <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                                </label>
+                                                            </div>
+                                                            <div class="flex items-center space-x-4">
+                                                                <label class="flex items-center space-x-1">
+                                                                    <PcidssCheckbox
+                                                                        :name="`attestationsScanComplianceConfirming_5_2_no`"
+                                                                        :inputValue="inputValues[`attestationsScanComplianceConfirming_5_2_no`]"
+                                                                    />
+                                                                    <span class="text-gray-700 cursor-pointer">No</span>
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                        <div class="flex items-center space-x-4">
-                                                            <label class="flex items-center space-x-1">
-                                                                <PcidssCheckbox
-                                                                    :name="`attestationsScanComplianceConfirming_5_2_no`"
-                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_2_no`]"
-                                                                />
-                                                                <span class="text-gray-700 cursor-pointer">No</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 5.3 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '13_5_3'">
                                         <table class="table-bordered table border-secondary">
-                                            <tr style="background-color: teal; color: white">
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
                                                 <th class="border border-slate-900 p-2 w-[29%]" rowspan="2">Date of the Scan(s)</th>
                                                 <th class="border border-slate-900 p-2 w-[10%]" colspan="2">Was the scan performed via authenticated scanning?</th>
                                                 <th class="border border-slate-900 p-2 w-[10%]" colspan="2">
@@ -1030,229 +1224,245 @@
                                                     For all scans where high-risk or critical vulnerabilities were found, provide date(s) of re-scans showing
                                                     that the vulnerabilities have been corrected.
                                                 </th>
-                                            </tr>
-                                            <tr style="background-color: #dfdfdf">
-                                                <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
-                                                <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
-                                                <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
-                                                <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
-                                            </tr>
-                                            <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
-                                                <td style="text-align:center;" class="border border-slate-900 p-2" v-for="(td, key) in row?.names">
-                                                    <div v-if="key === 1 || key === 2 || key === 3 || key === 4">
-                                                        <PcidssCheckbox
-                                                            :name="td"
-                                                            :inputValue="inputValues[td]"
-                                                        />
-                                                    </div>
-                                                    <div v-else>
-                                                        <PcidssTextarea
-                                                            :name="td"
-                                                            :inputValue = "inputValues[td]"
-                                                            :rows="1"
-                                                        />
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                                </tr>
+                                                <tr style="background-color: #dfdfdf">
+                                                    <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
+                                                    <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
+                                                    <td style="text-align:center;" class="border border-slate-900 p-2">Yes</td>
+                                                    <td style="text-align:center;" class="border border-slate-900 p-2">No</td>
+                                                </tr>
+                                                <tr v-for="(row, key) in JSON.parse(data?.form)?.tableBody">
+                                                    <td style="text-align:center;" class="border border-slate-900 p-0" v-for="(td, key) in row?.names">
+                                                        <div v-if="key === 1 || key === 2 || key === 3 || key === 4">
+                                                            <PcidssCheckbox
+                                                                :name="td"
+                                                                :inputValue="inputValues[td]"
+                                                            />
+                                                        </div>
+                                                        <div v-else>
+                                                            <PcidssTextarea
+                                                                :name="td"
+                                                                :inputValue = "inputValues[td]"
+                                                                :rows="1"
+                                                            />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
 
                                         <table class="mt-5 table">
-                                            <tr>
-                                                <td class="border border-slate-900 p-2 align-top" style="width: 50%">
-                                                    Indicate whether the ASV and the assessed entity completed the Attestations of Scan Compliance, confirming
-                                                    that all externally accessible (Internet-facing) IP addresses in existence at the entity were appropriately
-                                                    scoped for the ASV scans.
-                                                </td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <div class="flex items-center gap-4">
-                                                        <div class="flex items-center space-x-4">
-                                                            <label class="flex items-center space-x-1">
-                                                                <PcidssCheckbox
-                                                                    :name="`attestationsScanComplianceConfirming_5_3_yes`"
-                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_3_yes`]"
-                                                                />
-                                                                <span class="text-gray-700 cursor-pointer">Yes</span>
-                                                            </label>
+                                            <tbody>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2 align-top" style="width: 50%">
+                                                        Indicate whether the ASV and the assessed entity completed the Attestations of Scan Compliance, confirming
+                                                        that all externally accessible (Internet-facing) IP addresses in existence at the entity were appropriately
+                                                        scoped for the ASV scans.
+                                                    </td>
+                                                    <td class="border border-slate-900 p-2">
+                                                        <div class="flex items-center gap-4">
+                                                            <div class="flex items-center space-x-4">
+                                                                <label class="flex items-center space-x-1">
+                                                                    <PcidssCheckbox
+                                                                        :name="`attestationsScanComplianceConfirming_5_3_yes`"
+                                                                        :inputValue="inputValues[`attestationsScanComplianceConfirming_5_3_yes`]"
+                                                                    />
+                                                                    <span class="text-gray-700 cursor-pointer">Yes</span>
+                                                                </label>
+                                                            </div>
+                                                            <div class="flex items-center space-x-4">
+                                                                <label class="flex items-center space-x-1">
+                                                                    <PcidssCheckbox
+                                                                        :name="`attestationsScanComplianceConfirming_5_3_no`"
+                                                                        :inputValue="inputValues[`attestationsScanComplianceConfirming_5_3_no`]"
+                                                                    />
+                                                                    <span class="text-gray-700 cursor-pointer">No</span>
+                                                                </label>
+                                                            </div>
                                                         </div>
-                                                        <div class="flex items-center space-x-4">
-                                                            <label class="flex items-center space-x-1">
-                                                                <PcidssCheckbox
-                                                                    :name="`attestationsScanComplianceConfirming_5_3_no`"
-                                                                    :inputValue="inputValues[`attestationsScanComplianceConfirming_5_3_no`]"
-                                                                />
-                                                                <span class="text-gray-700 cursor-pointer">No</span>
-                                                            </label>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border border-slate-900 p-2 align-top">
-                                                    If yes, Identify the name of the document the assessor verified to include the entity’s documented policies
-                                                    and procedures requiring scanning at least once every three months going forward.
-                                                </td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <PcidssTextarea
-                                                        :name="`documentedPoliciesProcedures_5_3`"
-                                                        :inputValue = "inputValues[`documentedPoliciesProcedures_5_3`]"
-                                                        :rows="3"
-                                                    />
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="border border-slate-900 p-2 align-top">Assessor comments, if applicable:</td>
-                                                <td class="border border-slate-900 p-2">
-                                                    <PcidssTextarea
-                                                        :name="`assessorCommentsApplicable_5_3`"
-                                                        :inputValue = "inputValues[`assessorCommentsApplicable_5_3`]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2 align-top">
+                                                        If yes, Identify the name of the document the assessor verified to include the entity’s documented policies
+                                                        and procedures requiring scanning at least once every three months going forward.
+                                                    </td>
+                                                    <td class="border border-slate-900 p-0">
+                                                        <PcidssTextarea
+                                                            :name="`documentedPoliciesProcedures_5_3`"
+                                                            :inputValue = "inputValues[`documentedPoliciesProcedures_5_3`]"
+                                                            :rows="getRows('documentedPoliciesProcedures_5_3')"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="border border-slate-900 p-2 align-top">Assessor comments, if applicable:</td>
+                                                    <td class="border border-slate-900 p-0">
+                                                        <PcidssTextarea
+                                                            :name="`assessorCommentsApplicable_5_3`"
+                                                            :inputValue = "inputValues[`assessorCommentsApplicable_5_3`]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 6.3 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '14_1_3'">
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold w-[15%]">Tested Sample</th>
-                                                <th class="border border-slate-900 p-3 font-semibold w-[25%]">Sample Type Description</th>
-                                                <th class="border border-slate-900 p-3 font-semibold w-[25%]">All Items in Sample Set?</th>
-                                                <th class="border border-slate-900 p-3 font-semibold w-[15%]">Selection Method</th>
-                                                <th class="border border-slate-900 p-3 font-semibold w-[10%]">Total Sampled</th>
-                                                <th class="border border-slate-900 p-3 font-semibold w-[10%]">Total Population</th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <PcidssTextarea
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
+                                                    <th class="border border-slate-900 p-3 font-semibold w-[15%]">Tested Sample</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold w-[25%]">Sample Type Description</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold w-[25%]">All Items in Sample Set?</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold w-[15%]">Selection Method</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold w-[10%]">Total Sampled</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold w-[10%]">Total Population</th>
+                                                </tr>
+                                                <tr v-for="row in JSON.parse(data?.form)?.tableBody">
+                                                    <td class="border border-slate-900 p-0" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="getRows(td)"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 6.4 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '14_1_4'">
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold">Reference Number</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Document Name (including version, if applicable)</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Document Purpose</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Document Revision Date (if applicable)</th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <PcidssTextarea
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
+                                                    <th class="border border-slate-900 p-3 font-semibold">Reference Number</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Document Name (including version, if applicable)</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Document Purpose</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Document Revision Date (if applicable)</th>
+                                                </tr>
+                                                <tr v-for="row in JSON.parse(data?.form)?.tableBody">
+                                                    <td class="border border-slate-900 p-3" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 6.5 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '14_1_5'">
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold">Reference Number</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Title of Workpaper with Interview Notes</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Topics Covered</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Role(s) of Interviewee(s)</th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <PcidssTextarea
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
+                                                    <th class="border border-slate-900 p-3 font-semibold">Reference Number</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Title of Workpaper with Interview Notes</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Topics Covered</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Role(s) of Interviewee(s)</th>
+                                                </tr>
+                                                <tr v-for="row in JSON.parse(data?.form)?.tableBody">
+                                                    <td class="border border-slate-900 p-3" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- 6.6 Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === '14_1_6'">
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold">Reference Number</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Title of Workpaper or Evidence</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Topics Covered or Evidence Collected</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">
-                                                    Sample Set Reference Number from Table 6.3 (if applicable)
-                                                </th>
-                                            </tr>
-                                            <tr v-for="row in JSON.parse(data?.form)?.tableBody">
-                                                <td class="border border-slate-900 p-3" v-for="td in row?.names">
-                                                    <PcidssTextarea
-                                                        :name="td"
-                                                        :inputValue = "inputValues[td]"
-                                                        :rows="1"
-                                                    />
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
+                                                    <th class="border border-slate-900 p-3 font-semibold">Reference Number</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Title of Workpaper or Evidence</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Topics Covered or Evidence Collected</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">
+                                                        Sample Set Reference Number from Table 6.3 (if applicable)
+                                                    </th>
+                                                </tr>
+                                                <tr v-for="row in JSON.parse(data?.form)?.tableBody">
+                                                    <td class="border border-slate-900 p-3" v-for="td in row?.names">
+                                                        <PcidssTextarea
+                                                            :name="td"
+                                                            :inputValue = "inputValues[td]"
+                                                            :rows="1"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- A3 C Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === 'A3_1_3'">
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold">Requirement Number and Definition</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Information Required</th>
-                                                <th class="border border-slate-900 p-3 font-semibold">Explanation</th>
-                                            </tr>
-                                            <tr v-for="(row, rowKey) in JSON.parse(data?.form)?.tableBody" :key="rowKey">
-                                                <template v-for="(td, tdKey) in row" :key="tdKey">
-                                                    <td v-if="tdKey === 'name'" class="border border-slate-900 p-2">
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[td] ?? defaultValues.placeholder"
-                                                            :name="td"
-                                                        />
-                                                    </td>
-                                                    <td v-else-if="tdKey === 'title-1' && rowKey === 2" class="border border-slate-900 p-2" rowspan="2">
-                                                        {{ td }}
-                                                    </td>
-                                                    <td v-else-if="tdKey !== 'name'" class="border border-slate-900 p-2">
-                                                        {{ td }}
-                                                    </td>
-                                                </template>
-                                            </tr>
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
+                                                    <th class="border border-slate-900 p-3 font-semibold">Requirement Number and Definition</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Information Required</th>
+                                                    <th class="border border-slate-900 p-3 font-semibold">Explanation</th>
+                                                </tr>
+                                                <tr v-for="(row, rowKey) in JSON.parse(data?.form)?.tableBody" :key="rowKey">
+                                                    <template v-for="(td, tdKey) in row" :key="tdKey">
+                                                        <td v-if="tdKey === 'name'" class="border border-slate-900 p-2">
+                                                            <input
+                                                                type="text"
+                                                                class="form-input"
+                                                                :value="inputValues[td] ?? defaultValues.placeholder"
+                                                                :name="td"
+                                                            />
+                                                        </td>
+                                                        <td v-else-if="tdKey === 'title-1' && rowKey === 2" class="border border-slate-900 p-2" rowspan="2">
+                                                            {{ td }}
+                                                        </td>
+                                                        <td v-else-if="tdKey !== 'name'" class="border border-slate-900 p-2">
+                                                            {{ td }}
+                                                        </td>
+                                                    </template>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                     </div>
 
                                     <!-- A3 E Requirement Table -->
                                     <div v-if="JSON.parse(data?.form)?.isAssignmentKey === 'A3_1_5'">
                                         <table class="mt-5 table">
-                                            <tr style="background-color: teal; color: white">
-                                                <th class="border border-slate-900 p-3 font-semibold" colspan="2">Requirement Number and Definition</th>
-                                            </tr>
-                                            <tr v-for="(row, rowKey) in JSON.parse(data?.form)?.tableBody" :key="rowKey">
-                                                <td class="border border-slate-900 p-3" v-for="(td, tdKey) in row" :key="tdKey">
-                                                    <template v-if="tdKey === 'title'">
-                                                        {{ td }}
-                                                    </template>
-                                                    <template v-else-if="tdKey === 'name'">
-                                                        <input
-                                                            type="text"
-                                                            class="form-input"
-                                                            :value="inputValues[td] ?? defaultValues.placeholder"
-                                                            :name="td"
-                                                        />
-                                                    </template>
-                                                </td>
-                                            </tr>
+                                            <tbody>
+                                                <tr style="background-color: teal; color: white">
+                                                    <th class="border border-slate-900 p-3 font-semibold" colspan="2">Requirement Number and Definition</th>
+                                                </tr>
+                                                <tr v-for="(row, rowKey) in JSON.parse(data?.form)?.tableBody" :key="rowKey">
+                                                    <td class="border border-slate-900 p-3" v-for="(td, tdKey) in row" :key="tdKey">
+                                                        <template v-if="tdKey === 'title'">
+                                                            {{ td }}
+                                                        </template>
+                                                        <template v-else-if="tdKey === 'name'">
+                                                            <input
+                                                                type="text"
+                                                                class="form-input"
+                                                                :value="inputValues[td] ?? defaultValues.placeholder"
+                                                                :name="td"
+                                                            />
+                                                        </template>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
                                         </table>
                                         <table class="table-bordered mt-5 table border-dark">
-                                            <tr>
+                                            <tbody>
+                                                <tr>
                                                 <td class="border border-slate-900 p-3" colspan="3">
                                                     Describe the testing procedures derived and performed by the assessor to validate that the implemented
                                                     controls meet the Customized Approach Objective; for example, whether the customized control(s) is
@@ -1356,6 +1566,7 @@
                                                     />
                                                 </td>
                                             </tr>
+                                            </tbody>
                                         </table>
                                     </div>
                                 </div>
@@ -1365,7 +1576,7 @@
                                         <tr class="border border-slate-900" v-for="row in JSON.parse(data?.form)?.tableBody">
                                             <!-- Title Show -->
                                             <td
-                                                class="px-2 align-top dark:text-white-light"
+                                                class="px-2 align-top"
                                                 :class="{
                                                     'font-bold  py-2': row?.colspan,
                                                 }"
@@ -1467,11 +1678,11 @@
                                             </td>
 
                                             <!-- default apply for all -->
-                                            <td class="w-[60%] border border-slate-900 p-2" v-if="row?.name">
+                                            <td class="w-[60%] border border-slate-900 p-0" v-if="row?.name">
                                                 <PcidssTextarea
                                                     :name="row?.name"
                                                     :inputValue = "inputValues[row?.name]"
-                                                    :rows="1"
+                                                    :rows="getRows(row?.name)"
                                                 />
                                             </td>
                                         </tr>
@@ -1532,11 +1743,11 @@
                                             </tr>
                                         </tbody>
                                         <tfoot>
-                                            <tr class="bg-teal text-white">
-                                                <td class="border border-slate-900 p-3 text-left align-top" colspan="3" style="width: 50%">
+                                            <tr class="bg-teal ">
+                                                <td class="border border-slate-900 p-3 text-left align-top text-white" colspan="3" style="width: 50%">
                                                     <div class="text-dark" v-html="JSON.parse(data?.form)?.note?.title"></div>
                                                 </td>
-                                                <td class="border border-slate-900 p-1" colspan="3">
+                                                <td class="border border-slate-900 p-0 mb-0 align-top" colspan="3">
                                                     <PcidssTextarea
                                                         :name="JSON.parse(data?.form)?.note?.name"
                                                         :inputValue = "inputValues[JSON.parse(data?.form)?.note?.name]"
@@ -1581,7 +1792,7 @@
                                                     v-if="tdIndex === 'name'"
                                                     :name="td"
                                                     :inputValue = "inputValues[td]"
-                                                    :rows="4"
+                                                    :rows="10"
                                                 />
                                                     <div v-else v-html="td" class="p-2"></div>
                                                 </td>
@@ -1611,25 +1822,165 @@
             <button @click="isOpen = false" class="btn btn-sm btn-danger">✕</button>
         </div>
         <div class="px-4 py-2">
-            <TabGroup>
-                <TabList class="flex space-x-1 rounded-sm bg-gray-200 dark:bg-slate-800">
-                    <Tab
-                        v-for="(tab, index) in tabs"
-                        :key="index"
-                        class="w-full rounded-sm py-1.5 font-medium"
-                        :class="{ 'btn btn-info shadow-none': selectedTab === tab }"
-                        @click="changeTab(tab)"
-                    >
-                        <span class="font-semibold capitalize">{{ tab }}</span>
-                    </Tab>
-                </TabList>
+            <div>
+                <ul class="flex gap-4 mb-3">
+                    <li @click="fetchEvidence('document')" class="bg-gray-200 text-dark px-3 py-2 rounded-sm cursor-pointer block w-full text-center hover:bg-info hover:text-white" :class="{'bg-info text-white': currentTab === 'document'}">Document</li>
+                    <li @click="fetchEvidence('interview')" class="bg-gray-200 text-dark px-3 py-2 rounded-sm cursor-pointer block w-full text-center hover:bg-info hover:text-white" :class="{'bg-info text-white': currentTab === 'interview'}">Interview</li>
+                    <li @click="fetchEvidence('assessment')" class="bg-gray-200 text-dark px-3 py-2 rounded-sm cursor-pointer block w-full text-center hover:bg-info hover:text-white" :class="{'bg-info text-white': currentTab === 'assessment'}">Assessment</li>
+                </ul>
+            </div>
+            <div>
+                <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th class="border border-white-dark">Reference Number</th>
+                            <th class="border border-white-dark">{{ evidenceTitle.name?.title }}</th>
+                            <th class="border border-white-dark">{{ evidenceTitle?.purpose}}</th>
+                            <th class="border border-white-dark">{{ evidenceTitle?.revisionDate?.title}}</th>
+                            <th class="border border-white-dark">File Type</th>
+                            <!-- <th class="border border-white-dark text-right" v-if="!otherProject">Action</th> -->
+                        </tr>
+                    </thead>
 
-                <TabPanels>
-                    <TabPanel v-for="(tab, key) in tabs">
-                        <Evidence :tab="tab" :evidences="evidences" :fetchEvidence="fetchEvidence" otherProject="true" />
-                    </TabPanel>
-                </TabPanels>
-            </TabGroup>
+                    <tbody v-if="evidences?.length">
+                        <tr class="" v-for="(evidence,key) in evidences">
+                            <td class="border border-white-dark">{{ evidence?.reference_number_value ?? '---' }}</td>
+                            <td class="border border-white-dark">{{ evidence?.document_name_value ?? '---' }}</td>
+                            <td class="border border-white-dark">{{ evidence?.document_purpose_value ?? '---' }}</td>
+                            <td class="border border-white-dark">{{ evidence?.document_revision_date_value ?? '---' }}</td>
+                            <td class="border border-white-dark">
+                                <span class="px-[10px] py-[1px] rounded-sm text-white font-semibold text-sm"
+                                    :class="getExtensionColor(evidence?.extension)"
+                                    >{{ evidence?.extension }}</span>
+                            </td>
+                            <!-- <td class="border border-white-dark text-right" v-if="!otherProject">
+                                <div class="flex gap-1">
+                                    <button @click="getEvidenceById(evidence?.id)" class="btn btn-info btn-sm">
+                                        Add
+                                    </button>
+                                    <button @click="showEvidence(evidence?.id)" class="btn btn-info btn-sm">
+                                        View
+                                    </button>
+                                </div>
+                            </td> -->
+                        </tr>
+                    </tbody>
+                </table>
+                <template v-if="!(evidences?.length)">
+                        <h3 class="text-xl font-semibold text-center mt-40">No Data Found</h3>
+                </template>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div :class="[
+        isOpenEdit ? 'translate-x-0' : 'translate-x-full',
+        'fixed right-0 top-0 z-50 h-full w-[950px] bg-white dark:bg-black shadow-lg transition-transform duration-300 ease-in-out',
+    ]">
+        <div class="flex items-center justify-between border-b border-gray-200 bg-gray-50 dark:bg-black dark:border-gray-800 p-4">
+            <h2 class="text-2xl font-semibold">Create {{ title }}</h2>
+            <button @click="isOpenEdit = false" class="btn btn-sm btn-info">✕</button>
+        </div>
+        <div class="p-4">
+            <form @submit.prevent="submitEditForm">
+                <div class="space-y-5">
+                    <div>
+                        <label for="number">Reference Number <small class="text-red-500">*</small></label>
+                        <input v-model="editForm.reference_number_value" id="number" type="text" placeholder="Enter reference number"
+                            class="form-input" />
+                        <p v-if="errors?.number" class="text-red-500">{{ errors?.number[0] }}</p>
+                    </div>
+
+                    <div>
+                        <label for="name">{{ evidenceTitle.name?.title }} <small class="text-red-500">*</small></label>
+                        <input v-model="editForm.document_name_value" id="name" type="text" :placeholder="`${evidenceTitle.name?.title} ${evidenceTitle.name?.subTitle}`"
+                            class="form-input" />
+                        <p v-if="errors?.name" class="text-red-500">{{ errors?.name[0] }}</p>
+                    </div>
+
+                    <div>
+                        <label for="purpose">{{ evidenceTitle.purpose }} <small class="text-red-500">*</small></label>
+                        <input v-model="editForm.document_purpose_value" id="purpose" type="text" :placeholder="evidenceTitle.purpose"
+                            class="form-input" />
+                        <p v-if="errors?.purpose" class="text-red-500">{{ errors?.purpose[0] }}</p>
+                    </div>
+
+                    <div>
+                        <label for="revision_date">{{ evidenceTitle.revisionDate?.title}} <small class="text-red-500">*</small></label>
+                        <input v-model="editForm.document_revision_date_value" id="revision_date" :type="currentTab === tabs.DOCUMENT ? 'date' : 'text'" :placeholder="`${evidenceTitle.revisionDate?.title} ${evidenceTitle.revisionDate?.subTitle}`"
+                            class="form-input" />
+                        <p v-if="errors?.revision_date" class="text-red-500">{{ errors?.revision_date[0] }}</p>
+                    </div>
+
+
+                    <div>
+                        <div class="flex gap-2 items-center">
+                            <label for="file">Reference File <code>Docx,PDF,Text etc...</code> <small class="text-red-500">*</small></label>
+                            <span v-if="editForm.file" @click="showEvidence(editForm?.id)">
+                                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" class="w-4 h-4 cursor-pointer">
+                                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                                    <g id="SVGRepo_iconCarrier">
+                                        <g fill="#000000">
+                                        <path d="M9 .75A.75.75 0 019.75 0h4.5c.206 0 .393.083.529.218l.001.002.002.001A.748.748 0 0115 .75v4.5a.75.75 0 01-1.5 0V2.56L7.28 8.78a.75.75 0 01-1.06-1.06l6.22-6.22H9.75A.75.75 0 019 .75z"></path>
+                                        <path d="M3.25 3.5a.75.75 0 00-.75.75v7.5c0 .414.336.75.75.75h7.5a.75.75 0 00.75-.75v-4a.75.75 0 011.5 0v4A2.25 2.25 0 0110.75 14h-7.5A2.25 2.25 0 011 11.75v-7.5A2.25 2.25 0 013.25 2h4a.75.75 0 010 1.5h-4z"></path>
+                                    </g>
+                                    </g>
+                                </svg>
+                            </span>
+                        </div>
+
+                        <input @change="uploadFile" id="file" type="file" placeholder="Enter reference file" class="form-input" />
+                        <p v-if="errors?.file" class="text-red-500">{{ errors?.file[0] }}</p>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="btn btn-info" :disabled="isLoading" >
+                            <ButtonLoader :isLoading="isLoading"/>
+                            {{ 'Submit' }}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div :class="[
+        isShow ? 'translate-x-0' : 'translate-x-full',
+        'fixed right-0 top-0 z-50 h-full w-[950px] bg-white shadow-lg transition-transform duration-300 ease-in-out overflow-hidden',
+    ]">
+        <div class="flex items-center justify-between bg-gray-50 p-4">
+            <h2 class="text-2xl font-semibold">Show {{ title }}</h2>
+            <button @click="isShow = false" class="btn btn-sm btn-info">✕</button>
+        </div>
+        <div class="p-4">
+            <template v-if="evidence?.file === null">
+                <div class="flex flex-col items-center justify-center h-screen gap-3 text-center">
+                    <h1 class="font-semibold text-2xl">No Data Found</h1>
+                </div>
+            </template>
+            <template v-else>
+                <template v-if="evidence?.extension === 'pdf'">
+                <div class="w-full h-screen overflow-hidden">
+                    <iframe class="w-full h-full" :src="evidence?.fileUrl"></iframe>
+                </div>
+            </template>
+              <!-- Image Display with Standard Design -->
+            <template v-if="evidence?.extension === 'jpg' || evidence?.extension === 'jpeg' || evidence?.extension === 'png'">
+                <div class="w-full h-[80vh] max-w-full flex items-center justify-center overflow-hidden bg-gray-100">
+                    <img class="max-w-full max-h-full object-contain" :src="evidence?.fileUrl" alt="evidence">
+                </div>
+            </template>
+
+            <template v-else>
+                <div class="w-full h-screen overflow-hidden">
+                    <iframe class="w-full h-full" :src="evidence?.fileUrl"></iframe>
+                </div>
+            </template>
+            </template>
+
         </div>
     </div>
 </template>

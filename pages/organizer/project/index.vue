@@ -204,34 +204,32 @@ const getLastPage = computed(()=>{
         </div>
         <div class="mb-5">
             <div class="table-responsive">
-                <table>
+                <table class="table-fixed">
                     <thead>
                         <tr>
-                            <th>Project Id</th>
-                            <th>Project Name</th>
-                            <th class="w-[10%]">Description</th>
-                            <th>Assigned Users</th>
-                            <th>Created At</th>
-                            <th>Project Deadline</th>
-                            <th class="text-center">Action</th>
+                        <th class="w-[10%]">Project Id</th>
+                        <th class="w-[20%]">Project Name</th>
+                        <th class="w-[40%]">Description</th>
+                        <th class="w-[10%]">Assigned Users</th>
+                        <th class="w-[15%]">Created At</th>
+                        <th class="w-[15%]">Project Deadline</th>
+                        <th class="w-[10%] text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody v-if="status === 'success'">
                         <tr v-for="(project, key) in projects?.data?.projects?.data">
-                            <td>{{ project?.project_id }}</td>
-                            <td class="whitespace-nowrap">{{ project?.name }}</td>
-                            <td class="whitespace-nowrap w-[10%]">{{ project?.description }}</td>
-                            <td class="whitespace-nowrap">{{ project?.users_count }}</td>
-                            <td class="whitespace-nowrap">{{ formatDate(project?.created_at) }}</td>
-                            <td class="whitespace-nowrap">{{ project?.deadline }}</td>
-                            <td>
-                                <div class="flex gap-3">
-                                    <button class="btn btn-sm btn-info"
-                                        @click="getProjectById(project.id)">Edit</button>
-                                    <button class="btn btn-sm btn-danger"
-                                        @click="deleteProject(project.id)">Delete</button>
-                                </div>
-                            </td>
+                        <td>{{ project?.project_id }}</td>
+                        <td class="whitespace-nowrap">{{ project?.name }}</td>
+                        <td class="justify">{{ project?.description }}</td>
+                        <td class="whitespace-nowrap">{{ project?.users_count }}</td>
+                        <td class="whitespace-nowrap">{{ formatDate(project?.created_at) }}</td>
+                        <td class="whitespace-nowrap">{{ project?.deadline }}</td>
+                        <td class="text-center flex-shrink-0">
+                            <div class="flex gap-3">
+                            <button class="btn btn-sm btn-info" @click="getProjectById(project.id)">Edit</button>
+                            <button class="btn btn-sm btn-danger" @click="deleteProject(project.id)">Delete</button>
+                            </div>
+                        </td>
                         </tr>
                     </tbody>
                 </table>

@@ -31,7 +31,7 @@
     <input
         type="checkbox"
         :name="name"
-        class="form-check-input h-4 w-4 border border-secondary"
+        class="form-check-input h-4 w-4 border border-secondary cursor-pointer"
         :checked="(inputValue && inputValue == '☒') ?? checked"
         :value="defaultValues.checked"
     />

@@ -109,12 +109,14 @@
 
 
         if(!form.value.sourceProject || !form.value.targetProject){
-            toast.error('Please select must SOURCE and TARGET project');
+            toast.error('Please select must FORM and TO project');
+            isLoading.value = false;
             return;
         }
 
         if(form.value.sourceProject === form.value.targetProject){
-            toast.error('Please select deferent SOURCE and TARGET project');
+            toast.error('Please select deferent FORM and TO project');
+            isLoading.value = false;
             return;
         }
 
@@ -149,22 +151,22 @@
         </div>
         <div class="mb-5">
             <div class="table-responsive">
-                <table>
+                <table class="table-fixed w-full">
                     <thead>
                         <tr>
-                            <th>#SL</th>
-                            <th>Project Name</th>
-                            <th>Description</th>
-                            <th class="text-center">Action</th>
+                            <th class="w-[10%]">#SL</th>
+                            <th class="w-[20%]">Project Name</th>
+                            <th class="w-[40%]">Description</th>
+                            <th class="w-[10%] text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody v-if="status === 'success'">
-                        <tr v-for="(project, key) in projects?.data">
+                        <tr v-for="(project, key) in projects?.data" :key="project?.id">
                             <td>{{ key + 1 }}</td>
                             <td>{{ project?.name }}</td>
-                            <td>{{ project?.description }}</td>
-                            <td>
-                                <div class="flex gap-3">
+                            <td class="">{{ project?.description }}</td>
+                            <td class="text-center">
+                                <div class="flex gap-3 justify-center">
                                     <NuxtLink :to="`/user/assignment/${project?.id}`" class="btn btn-info btn-sm">Assessment</NuxtLink>
                                     <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
                                         <span>Download</span>
@@ -269,36 +271,20 @@
         <div class="p-4">
             <form @submit.prevent="submitProjectDuplicateForm()">
                 <div class="space-y-5">
-                    <h4>Select the project from which you would like to copy the assessment value. <small class="text-red-500">*</small></h4>
+                    <h4>Select form project<small class="text-red-500">*</small></h4>
                     <div class="max-h-[300px] overflow-hidden menu-scroll overflow-y-scroll">
-                        <div class="bg-gray-200 dark:bg-slate-800 p-2 rounded-sm mb-2" v-for="(project,key) in projects?.data" :key="key">
-                            <label class="flex items-center cursor-pointer p-0 m-0">
-                                <input
-                                    type="radio"
-                                    name="source_project"
-                                    class="form-radio border border-gray-500"
-                                    :value="project.id"
-                                    v-model="form.sourceProject"
-                                />
-                                <span class="text-white-dark">{{ project?.name }}</span>
-                            </label>
-                        </div>
+                        <select class="form-select text-white-dark" v-model="form.sourceProject">
+                            <option value="" disabled selected>Select one project</option>
+                            <option v-for="(project, key) in projects?.data" :key="key" :value="project?.id">{{ project?.name }}</option>
+                        </select>
                     </div>
 
-                    <h4>Select the project where you want to paste the assessment value <small class="text-red-500">*</small></h4>
+                    <h4>Select to project <small class="text-red-500">*</small></h4>
                     <div class="max-h-[300px] overflow-hidden menu-scroll overflow-y-scroll">
-                        <div class="bg-gray-200 dark:bg-slate-800 p-2 rounded-sm mb-2" v-for="(project,key) in projects?.data" :key="key">
-                            <label class="flex items-center cursor-pointer p-0 m-0">
-                                <input
-                                    type="radio"
-                                    name="target_project"
-                                    class="form-radio border-gray-500"
-                                    :value="project.id"
-                                    v-model="form.targetProject"
-                                />
-                                <span class="text-white-dark">{{ project?.name }}</span>
-                            </label>
-                        </div>
+                        <select class="form-select text-white-dark" v-model="form.targetProject">
+                            <option value="" disabled selected>Select one project</option>
+                            <option v-for="(project, key) in projects?.data" :key="key" :value="project?.id">{{ project?.name }}</option>
+                        </select>
                     </div>
 
                     <div>

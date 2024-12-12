@@ -121,7 +121,7 @@
         logoutLoading.value = true;
         logout();
         pending.value = false
-        toast.success('Logout Successfully....')
+        //toast.success('Logout Successfully....')
     };
 </script>
 
@@ -156,7 +156,7 @@
                     class="flex items-center space-x-1.5 ltr:ml-auto rtl:mr-auto rtl:space-x-reverse dark:text-[#d0d2d6] sm:flex-1 ltr:sm:ml-0 sm:rtl:mr-0 lg:space-x-2"
                 >
                     <div class="sm:ltr:mr-auto sm:rtl:ml-auto">
-                        <form
+                        <!-- <form
                             class="absolute inset-x-0 top-1/2 z-10 mx-4 hidden -translate-y-1/2 sm:relative sm:top-0 sm:mx-0 sm:block sm:translate-y-0"
                             :class="{ '!block': search }"
                             @submit.prevent="search = false"
@@ -189,7 +189,7 @@
                                     </svg>
                                 </button>
                             </div>
-                        </form>
+                        </form> -->
 
                         <button
                             type="button"
@@ -290,7 +290,7 @@
                                                 </div>
                                             </div>
                                         </li>
-                                        <li>
+                                        <!-- <li>
                                             <NuxtLink to="#" class="dark:hover:text-white" @click="close()">
                                                 <svg
                                                     class="h-4.5 w-4.5 shrink-0 ltr:mr-2 rtl:ml-2"
@@ -311,7 +311,7 @@
 
                                                 Profile
                                             </NuxtLink>
-                                        </li>
+                                        </li> -->
 
                                         <li class="border-t border-white-light dark:border-white-light/10">
                                             <div v-if="pending" class="dark:bg-opacity-[0.08] grid min-h-[58px] place-content-center bg-white-light/30 dark:bg-dark">

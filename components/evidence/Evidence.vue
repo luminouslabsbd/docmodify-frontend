@@ -19,11 +19,6 @@
             type:Function,
             required:true,
         },
-        otherProject:{
-            type:Boolean,
-            required:false,
-            default:false
-        }
     })
 
     const evidenceTitle = ref({
@@ -214,6 +209,7 @@
 
 
 const getEvidenceById = async (id) => {
+    alert(id);
     const { data, error, status } = await useApiFetch(`/user/show-evidence/${id}`, {
         method: 'GET',
 
@@ -225,11 +221,16 @@ const getEvidenceById = async (id) => {
 
     if (status.value === 'success') {
         editForm.value = data.value.data
+        console.log("🚀 ~ getEvidenceById ~ editForm:", editForm.value)
         isEdit.value.edit = true;
         isEdit.value.id = id;
         isOpen.value = true;
     }
 }
+
+watch(() => evidences, (newEvidences) => {
+  console.log('Evidences updated:', newEvidences);
+});
 </script>
 <template>
     <div class="bg-gray-100 dark:bg-slate-800 mt-5 px-4 py-2">
@@ -243,6 +244,7 @@ const getEvidenceById = async (id) => {
         </div>
     </div>
     <div>
+        {{  evidences }}
         <div class="table-responsive">
         <table>
             <thead>
@@ -252,9 +254,10 @@ const getEvidenceById = async (id) => {
                     <th class="border border-white-dark">{{ evidenceTitle?.purpose}}</th>
                     <th class="border border-white-dark">{{ evidenceTitle?.revisionDate?.title}}</th>
                     <th class="border border-white-dark">File Type</th>
-                    <th class="border border-white-dark text-right" v-if="!otherProject">Action</th>
+                    <th class="border border-white-dark text-right">Action</th>
                 </tr>
             </thead>
+
             <tbody v-if="evidences?.length">
                 <tr class="" v-for="(evidence,key) in evidences">
                     <td class="border border-white-dark">{{ evidence?.reference_number_value ?? '---' }}</td>
@@ -266,18 +269,20 @@ const getEvidenceById = async (id) => {
                               :class="getExtensionColor(evidence?.extension)"
                             >{{ evidence?.extension }}</span>
                     </td>
-                    <td class="border border-white-dark text-right" v-if="!otherProject">
+                    <td class="border border-white-dark text-right">
                         <div class="flex gap-1">
                             <button @click="getEvidenceById(evidence?.id)" class="btn btn-info btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
+                                <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-3">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
-                                </svg>
+                                </svg> -->
+                                Add
                             </button>
                             <button @click="showEvidence(evidence?.id)" class="btn btn-info btn-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-4">
+                                <!-- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-3 h-4">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                </svg>
+                                </svg> -->
+                                View
                             </button>
                         </div>
                     </td>

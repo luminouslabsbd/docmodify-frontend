@@ -39,21 +39,25 @@
         }
     )
 
-    const downloadDocx = async (id) => {
-        isDownloading.value = id;
-        try {
-            const {data} = await useApiFetch(`/user/generate-docx/${id}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                },
-            });
+    const downloadDocxFile = async (projectId) => {
+        const { data, refresh: getProgress } = await useApiFetch(`/organizer/download-generated-docx-file`, {
+            method: 'GET',
+            params:{
+                projectId,
+                userId : route.params.id,
+            }
+        });
+
+
+        if(data.value.file) {
             window.location = data.value.downloadUrl
-            isDownloading.value = null;
-        } catch (error) {
-            console.error("Docx Generate Error:", error);
-            isDownloading.value = null;
+        }else{
+            toast.warning("Haven't completed the assessment yet.");
         }
+
+        // downloadModal.value = false;
+        // generateDownload.value = false;
+        // isDownloading.value = false;
     };
 
     const getProjectForAssign = () => {
@@ -145,7 +149,7 @@
                             <td>{{  project?.description }}</td>
                             <td>
                                 <div class="flex gap-3">
-                                    <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
+                                    <button @click="downloadDocxFile(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
                                         <span v-if="isDownloading === project?.id" class="inline-flex h-4 w-4 animate-spin rounded-full border-2 border-white !border-l-transparent dark:border-black"></span>
                                         <span>{{ isDownloading === project?.id? 'Downloading...' : 'Download'}}</span>
                                     </button>
