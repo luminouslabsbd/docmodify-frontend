@@ -89,20 +89,32 @@
             }
         }, 1000);
     };
+    const downloadDocxFile = async (id) => {
+        try {
+            const { data, refresh: getProgress } = await useApiFetch(`/user/download/generated-docx-file`, {
+                method: 'GET',
+                params: {
+                    projectId: id
+                }
+            });
 
-    const downloadDocxFile = async () => {
-        const { data, refresh: getProgress } = await useApiFetch(`/user/download/generated-docx-file`, {
-            method: 'GET',
-            params:{
-                projectId:projectId.value
+            if(data.value == null) {
+                alert("File not found");
+                return;
+            }else{
+                window.location.href = data.value;
             }
-        });
-        if(data.value.downloadUrl) window.location = data.value.downloadUrl
 
-        downloadModal.value = false;
-        generateDownload.value = false;
-        isDownloading.value = false;
+        } catch (error) {
+            console.error("Error downloading file:", error);
+        } finally {
+            downloadModal.value = false;
+            generateDownload.value = false;
+            isDownloading.value = false;
+        }
     };
+
+
 
     const submitProjectDuplicateForm = async() =>{
         isLoading.value = true;
@@ -155,9 +167,9 @@
                     <thead>
                         <tr>
                             <th class="w-[10%]">#SL</th>
-                            <th class="w-[20%]">Project Name</th>
+                            <th class="w-[15%]">Project Name</th>
                             <th class="w-[40%]">Description</th>
-                            <th class="w-[10%] text-center">Action</th>
+                            <th class="w-[15%] text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody v-if="status === 'success'">
@@ -166,10 +178,15 @@
                             <td>{{ project?.name }}</td>
                             <td class="">{{ project?.description }}</td>
                             <td class="text-center">
-                                <div class="flex gap-3 justify-center">
+                                <div class="flex gap-1 justify-center">
                                     <NuxtLink :to="`/user/assignment/${project?.id}`" class="btn btn-info btn-sm">Assessment</NuxtLink>
-                                    <button @click="downloadDocx(project?.id)" class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
-                                        <span>Download</span>
+                                    <tippy target="generateDocx">Generate Docx</tippy>
+                                    <button @click="downloadDocx(project?.id)" v-tippy:generateDocx class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4"  viewBox="0 0 24 24"><g fill="none"><path fill="currentColor" d="M7.378 11.63h-.75zm0 .926l-.562.497a.75.75 0 0 0 1.08.044zm2.141-1.015a.75.75 0 0 0-1.038-1.082zm-2.958-1.038a.75.75 0 1 0-1.122.994zm8.37-1.494a.75.75 0 1 0 1.102-1.018zM12.045 6.25c-2.986 0-5.416 2.403-5.416 5.38h1.5c0-2.137 1.747-3.88 3.916-3.88zm-5.416 5.38v.926h1.5v-.926zm1.269 1.467l1.622-1.556l-1.038-1.082l-1.622 1.555zm.042-1.039l-1.378-1.555l-1.122.994l1.377 1.556zm8.094-4.067a5.42 5.42 0 0 0-3.99-1.741v1.5a3.92 3.92 0 0 1 2.889 1.26zm.585 3.453l.56-.498a.75.75 0 0 0-1.08-.043zm-2.139 1.014a.75.75 0 1 0 1.04 1.082zm2.96 1.04a.75.75 0 0 0 1.12-.997zm-8.393 1.507a.75.75 0 0 0-1.094 1.026zm2.888 2.745c2.993 0 5.434-2.4 5.434-5.38h-1.5c0 2.135-1.753 3.88-3.934 3.88zm5.434-5.38v-.926h-1.5v.926zm-1.27-1.467l-1.619 1.555l1.04 1.082l1.618-1.555zm-.04 1.04l1.38 1.554l1.122-.996l-1.381-1.555zM7.952 16.03a5.45 5.45 0 0 0 3.982 1.719v-1.5c-1.143 0-2.17-.48-2.888-1.245z"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5"/></g></svg>
+                                    </button>
+                                    <tippy target="downloadDocx">Download</tippy>
+                                    <button @click="downloadDocxFile(project?.id)" v-tippy:downloadDocx class="btn btn-info btn-sm flex gap-2" :disabled="isDownloading === project?.id">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M22 16v-1c0-2.828 0-4.242-.879-5.12C20.242 9 18.828 9 16 9H8c-2.829 0-4.243 0-5.122.88C2 10.757 2 12.17 2 14.997V16c0 2.829 0 4.243.879 5.122C3.757 22 5.172 22 8 22h8c2.828 0 4.243 0 5.121-.878C22 20.242 22 18.829 22 16" opacity=".5"/><path fill="currentColor" fill-rule="evenodd" d="M12 1.25a.75.75 0 0 0-.75.75v10.973l-1.68-1.961a.75.75 0 1 0-1.14.976l3 3.5a.75.75 0 0 0 1.14 0l3-3.5a.75.75 0 1 0-1.14-.976l-1.68 1.96V2a.75.75 0 0 0-.75-.75" clip-rule="evenodd"/></svg>
                                     </button>
                                 </div>
                             </td>
@@ -245,7 +262,7 @@
 
                                         <p>Your Document is ready for download. click the download button for download this file.</p>
 
-                                        <button class="rounded-lg bg-primary px-4 py-2 text-white shadow" @click="downloadDocxFile">Download</button>
+                                        <button class="rounded-lg bg-primary px-4 py-2 text-white shadow" @click="downloadDocxFile(projectId)">Download</button>
                                     </div>
                                 </div>
                             </DialogPanel>

@@ -105,7 +105,7 @@
 <script setup>
     import { computed, ref, onMounted, watch, defineEmits } from 'vue';
     import { Ckeditor } from '@ckeditor/ckeditor5-vue';
-    import { BalloonEditor, AutoLink, Autosave, Bold, Essentials, Italic, Link, Paragraph, Underline, FontSize } from 'ckeditor5';
+    import { BalloonEditor, AutoLink, Autosave, Bold, Essentials, Italic, Link, Paragraph, Underline, FontSize,FontColor } from 'ckeditor5';
     import 'ckeditor5/ckeditor5.css';
 
     const props = defineProps({
@@ -146,10 +146,10 @@
 
         return {
             toolbar: {
-                items: ['bold', 'italic', 'underline','fontSize'],
+                items: ['bold', 'italic', 'underline','fontSize','fontColor'],
                 shouldNotGroupWhenFull: true,
             },
-            plugins: [AutoLink, Autosave, Bold, Essentials, Italic, Link, Paragraph, Underline,FontSize,],
+            plugins: [AutoLink, Autosave, Bold, Essentials, Italic, Link, Paragraph, Underline,FontSize,FontColor],
             initialData: content.value,
             link: {
                 addTargetToExternalLinks: true,
@@ -200,11 +200,11 @@
 <template>
     <ckeditor
         v-if="editor && config"
+        :style="{minHeight:`${rows}rem`}"
         :modelValue="localValue"
         @update:modelValue="handleChange"
         :editor="editor"
         :config="config"
-        @ready="handleEditorReady"
     />
     <input type="hidden" :name="name" :value="localValue" />
 </template>

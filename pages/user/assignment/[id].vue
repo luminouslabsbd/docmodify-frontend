@@ -158,22 +158,12 @@
         pciDssStatusRefresh();
     });
 
-    const cleanHtml = (input) => {
-        if (!input || typeof input !== 'string' || input.trim() === '') {
-            return '';
-        }
-
-        input = input.replace(/\n/g, '%%NEWLINE%%');
-        input = input.replace(/<(?!\/?(i|b|em|strong|u)\b)[^>]+>/gi, '');
-        return input.replace(/%%NEWLINE%%/g, '\n');
-    }
-
     const submitForm = async () => {
         isLoading.value = true;
         const formData = new FormData(event.target);
         const pciDss = {};
         formData.forEach((value, key) => {
-            pciDss[key] = cleanHtml(value);
+            pciDss[key] = value
         });
 
         try {
